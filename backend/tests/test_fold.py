@@ -32,6 +32,26 @@ def test_user_fold_returns_structure(client):
     assert body["length_delta"] == len(VALID_RNA) - 167
 
 
+def test_reference_fold_bases_are_separated(client):
+    body = client.get("/api/rna/reference").json()
+    residues = body["residues"]
+    n = len(residues)
+    backbone = []
+    for i in range(n - 1):
+        dx = residues[i + 1]["x"] - residues[i]["x"]
+        dy = residues[i + 1]["y"] - residues[i]["y"]
+        backbone.append((dx * dx + dy * dy) ** 0.5)
+    backbone.sort()
+    median = backbone[len(backbone) // 2]
+    min_other = float("inf")
+    for i in range(n):
+        for j in range(i + 2, n):
+            dx = residues[j]["x"] - residues[i]["x"]
+            dy = residues[j]["y"] - residues[i]["y"]
+            min_other = min(min_other, (dx * dx + dy * dy) ** 0.5)
+    assert min_other > median * 0.4
+
+
 def test_fold_rejects_dna(client):
     token = register_user(client, "Alice")["access_token"]
     response = client.post(
