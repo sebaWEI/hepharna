@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from 'react'
 import { CheckCircle, WarningCircle } from '@phosphor-icons/react'
+import { useLocale } from '../context/LocaleContext'
 import { validateSequence } from '../utils/rna'
 
 const GROUP = 5
@@ -27,11 +28,22 @@ function splitGroups(sequence: string): string[] {
 }
 
 export function SequenceEditor({ value, onChange, minLength, maxLength }: Props) {
+  const { t } = useLocale()
   const result = validateSequence(value, minLength, maxLength)
   const sequence = result.sequence
   const groups = splitGroups(sequence)
   const inputs = useRef<Array<HTMLInputElement | null>>([])
   const caret = useRef<number | null>(null)
+  const status =
+    result.issue === 'empty'
+      ? t('seq.empty')
+      : result.issue === 'chars'
+        ? t('seq.chars')
+        : result.issue === 'short'
+          ? t('seq.short', { min: minLength })
+          : result.issue === 'long'
+            ? t('seq.long', { max: maxLength })
+            : t('seq.valid')
 
   useLayoutEffect(() => {
     if (caret.current === null) return
@@ -63,8 +75,8 @@ export function SequenceEditor({ value, onChange, minLength, maxLength }: Props)
     <div className="grid gap-4">
       <div className="grid gap-2">
         <div className="flex items-center justify-between text-sm text-mute">
-          <span>RNA sequence</span>
-          <span className="font-mono text-xs">5 nt / group</span>
+          <span>{t('seq.label')}</span>
+          <span className="font-mono text-xs">{t('seq.group')}</span>
         </div>
         <div className="rounded-[16px] border border-line bg-raised p-4">
           <div className="mb-4 flex items-center justify-between font-mono text-xs text-mute">
@@ -85,7 +97,7 @@ export function SequenceEditor({ value, onChange, minLength, maxLength }: Props)
                     spellCheck={false}
                     autoCapitalize="characters"
                     autoCorrect="off"
-                    aria-label={`Bases ${start} to ${start + GROUP - 1}`}
+                    aria-label={t('seq.bases', { start, end: start + GROUP - 1 })}
                     className="w-full rounded-[8px] border border-line bg-bg px-1.5 py-2 text-center font-mono text-base uppercase tracking-[0.18em] text-ink outline-none focus:border-accent"
                     onChange={(event) => {
                       const raw = event.target.value
@@ -139,11 +151,11 @@ export function SequenceEditor({ value, onChange, minLength, maxLength }: Props)
       </div>
       <div className="grid gap-3 rounded-[16px] border border-line bg-surface p-4 md:grid-cols-3">
         <div>
-          <p className="text-xs text-mute">Length</p>
+          <p className="text-xs text-mute">{t('seq.length')}</p>
           <p className="font-mono text-2xl">{result.length} nt</p>
         </div>
         <div>
-          <p className="text-xs text-mute">GC content</p>
+          <p className="text-xs text-mute">{t('seq.gc')}</p>
           <p className="font-mono text-2xl">{result.gcContent.toFixed(1)}%</p>
         </div>
         <div className="flex items-center gap-2">
@@ -152,7 +164,7 @@ export function SequenceEditor({ value, onChange, minLength, maxLength }: Props)
           ) : (
             <WarningCircle size={22} className="text-danger" />
           )}
-          <p className={result.valid ? 'text-accent' : 'text-danger'}>{result.message}</p>
+          <p className={result.valid ? 'text-accent' : 'text-danger'}>{status}</p>
         </div>
       </div>
     </div>

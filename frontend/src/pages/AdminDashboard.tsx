@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '../components/Button'
+import { useLocale } from '../context/LocaleContext'
 import { api } from '../services/api'
 import type { AdminDashboard } from '../types'
-import { errorMessage } from '../types'
 
 export function AdminDashboardPage() {
+  const { t, te } = useLocale()
   const [data, setData] = useState<AdminDashboard | null>(null)
   const [error, setError] = useState('')
   const [exporting, setExporting] = useState(false)
@@ -14,8 +15,8 @@ export function AdminDashboardPage() {
     api
       .adminDashboard()
       .then(setData)
-      .catch((err) => setError(errorMessage(err)))
-  }, [])
+      .catch((err) => setError(te(err)))
+  }, [te])
 
   async function exportCsv() {
     if (exporting) return
@@ -23,7 +24,7 @@ export function AdminDashboardPage() {
     try {
       await api.exportCsv()
     } catch (err) {
-      setError(errorMessage(err))
+      setError(te(err))
     } finally {
       setExporting(false)
     }
@@ -31,23 +32,23 @@ export function AdminDashboardPage() {
 
   const cards = data
     ? [
-        ['Participants', data.participants],
-        ['Total Designs', data.total_designs],
-        ['Pending', data.pending],
-        ['Published', data.published],
+        [t('admin.participants'), data.participants],
+        [t('admin.totalDesigns'), data.total_designs],
+        [t('admin.pendingCount'), data.pending],
+        [t('admin.published'), data.published],
       ]
     : []
 
   return (
     <section>
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <h1 className="text-4xl">HEPHA-RNA Admin</h1>
+        <h1 className="text-4xl">{t('admin.title')}</h1>
         <div className="flex gap-3">
           <Link to="/admin/submissions?status=submitted" className="rounded-full bg-accent px-5 py-2.5 text-bg">
-            Pending submissions
+            {t('admin.pending')}
           </Link>
           <Button variant="ghost" onClick={exportCsv} disabled={exporting}>
-            {exporting ? 'Exporting...' : 'Export Submissions CSV'}
+            {exporting ? t('admin.exporting') : t('admin.export')}
           </Button>
         </div>
       </div>

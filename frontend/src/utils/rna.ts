@@ -3,6 +3,7 @@ export type SequenceIssue = {
   sequence: string
   length: number
   gcContent: number
+  issue: 'empty' | 'chars' | 'short' | 'long' | null
   message: string
 }
 
@@ -30,6 +31,7 @@ export function validateSequence(
       sequence,
       length: 0,
       gcContent: 0,
+      issue: 'empty',
       message: 'Sequence cannot be empty.',
     }
   }
@@ -40,6 +42,7 @@ export function validateSequence(
       sequence,
       length: sequence.length,
       gcContent: gcContent(sequence),
+      issue: 'chars',
       message: 'Your sequence contains invalid characters. Only A, U, G and C are allowed.',
     }
   }
@@ -49,6 +52,7 @@ export function validateSequence(
       sequence,
       length: sequence.length,
       gcContent: gcContent(sequence),
+      issue: 'short',
       message: `Sequence is too short. Minimum length is ${minLength} nt.`,
     }
   }
@@ -58,6 +62,7 @@ export function validateSequence(
       sequence,
       length: sequence.length,
       gcContent: gcContent(sequence),
+      issue: 'long',
       message: `Sequence is too long. Maximum length is ${maxLength} nt.`,
     }
   }
@@ -66,6 +71,7 @@ export function validateSequence(
     sequence,
     length: sequence.length,
     gcContent: gcContent(sequence),
+    issue: null,
     message: 'Valid RNA sequence',
   }
 }
@@ -75,10 +81,10 @@ export function formatScore(score: number | null | undefined): string {
   return score.toFixed(2)
 }
 
-export function formatDate(value: string | null | undefined): string {
+export function formatDate(value: string | null | undefined, locale: 'en' | 'zh' = 'en'): string {
   if (!value) return '-'
   const date = new Date(value)
-  return date.toLocaleString([], {
+  return date.toLocaleString(locale === 'zh' ? 'zh-CN' : 'en-US', {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',

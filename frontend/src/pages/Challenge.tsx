@@ -4,14 +4,15 @@ import { LeaderboardList } from '../components/LeaderboardList'
 import { SequenceDisplay } from '../components/SequenceDisplay'
 import { StatusBadge } from '../components/StatusBadge'
 import { useAuth } from '../context/AuthContext'
+import { useLocale } from '../context/LocaleContext'
 import { useLeaderboard } from '../hooks/useLeaderboard'
 import { api } from '../services/api'
 import type { CurrentDesignResponse, DesignPublic } from '../types'
-import { errorMessage } from '../types'
 import { formatScore } from '../utils/rna'
 
 export function ChallengePage() {
   const { user, refresh } = useAuth()
+  const { t, te } = useLocale()
   const location = useLocation()
   const { data, changed } = useLeaderboard(8)
   const [current, setCurrent] = useState<CurrentDesignResponse | null>(null)
@@ -23,8 +24,8 @@ export function ChallengePage() {
     api
       .currentDesign()
       .then(setCurrent)
-      .catch((err) => setError(errorMessage(err)))
-  }, [refresh])
+      .catch((err) => setError(te(err)))
+  }, [refresh, te])
 
   const design = current?.design
   const score = design?.score ?? null
@@ -33,16 +34,16 @@ export function ChallengePage() {
   return (
     <section className="mx-auto grid max-w-7xl gap-8 px-4 py-10 lg:grid-cols-[1.2fr_0.8fr]">
       <div className="rounded-[16px] border border-line bg-surface p-6 md:p-8">
-        <p className="font-mono text-xs tracking-[0.22em] text-accent">HEPHA-RNA DESIGN CHALLENGE</p>
-        <h1 className="mt-4 text-4xl">Hello, {user?.username}</h1>
-        <p className="mt-2 font-mono text-mute">Participant #{user?.participant_id}</p>
+        <p className="font-mono text-xs tracking-[0.22em] text-accent">{t('challenge.kicker')}</p>
+        <h1 className="mt-4 text-4xl">{t('challenge.hello', { name: user?.username ?? '' })}</h1>
+        <p className="mt-2 font-mono text-mute">{t('challenge.participant', { id: user?.participant_id ?? '' })}</p>
         <div className="mt-8 border-t border-line pt-8">
-          <h2 className="text-sm tracking-[0.16em] text-mute">YOUR CURRENT DESIGN</h2>
+          <h2 className="text-sm tracking-[0.16em] text-mute">{t('challenge.current')}</h2>
           {submitted ? (
             <div className="mt-4 rounded-[16px] border border-accent/30 bg-accent/10 p-4">
-              <p>Design submitted successfully!</p>
-              <p className="mt-1 font-mono text-sm">Design ID: {submitted.design_id}</p>
-              <p className="text-sm text-mute">Status: Pending evaluation</p>
+              <p>{t('challenge.submitted')}</p>
+              <p className="mt-1 font-mono text-sm">{t('challenge.designId', { id: submitted.design_id })}</p>
+              <p className="text-sm text-mute">{t('challenge.pendingEval')}</p>
             </div>
           ) : null}
           {error ? <p className="mt-4 text-danger">{error}</p> : null}
@@ -52,30 +53,30 @@ export function ChallengePage() {
               <StatusBadge status={design.status} />
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-xs text-mute">SCORE</p>
+                  <p className="text-xs text-mute">{t('challenge.score')}</p>
                   <p className="font-mono text-5xl">{formatScore(score)}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-mute">RANK</p>
+                  <p className="text-xs text-mute">{t('challenge.rank')}</p>
                   <p className="font-mono text-5xl">{rank ? `#${rank}` : '-'}</p>
                 </div>
               </div>
             </div>
           ) : (
-            <p className="mt-5 text-mute">No design yet. Start with a sequence and submit it for scoring.</p>
+            <p className="mt-5 text-mute">{t('challenge.empty')}</p>
           )}
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to="/design" className="rounded-full bg-accent px-5 py-2.5 text-bg">
-              {current?.draft || design ? 'Edit Design' : 'Design RNA'}
+              {current?.draft || design ? t('challenge.edit') : t('challenge.design')}
             </Link>
             <Link to="/designs" className="rounded-full border border-line px-5 py-2.5">
-              My Designs
+              {t('challenge.mine')}
             </Link>
           </div>
         </div>
       </div>
       <aside className="rounded-[16px] border border-line bg-surface p-6">
-        <h2 className="text-sm tracking-[0.16em] text-mute">LIVE LEADERBOARD</h2>
+        <h2 className="text-sm tracking-[0.16em] text-mute">{t('challenge.live')}</h2>
         <div className="mt-5">
           {data ? (
             <LeaderboardList
@@ -84,11 +85,11 @@ export function ChallengePage() {
               highlight={user?.participant_id}
             />
           ) : (
-            <p className="text-mute">Updating leaderboard...</p>
+            <p className="text-mute">{t('challenge.updating')}</p>
           )}
         </div>
         <Link to="/leaderboard" className="mt-6 inline-block text-sm text-accent">
-          Open full board
+          {t('challenge.openBoard')}
         </Link>
       </aside>
     </section>

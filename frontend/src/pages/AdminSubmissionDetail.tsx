@@ -4,13 +4,14 @@ import { Link, useParams } from 'react-router-dom'
 import { Button } from '../components/Button'
 import { SequenceDisplay } from '../components/SequenceDisplay'
 import { StatusBadge } from '../components/StatusBadge'
+import { useLocale } from '../context/LocaleContext'
 import { api } from '../services/api'
 import type { AdminSubmission } from '../types'
-import { errorMessage } from '../types'
 import { formatDate, formatScore } from '../utils/rna'
 
 export function AdminSubmissionDetailPage() {
   const { id } = useParams()
+  const { locale, t, te } = useLocale()
   const [design, setDesign] = useState<AdminSubmission | null>(null)
   const [score, setScore] = useState('')
   const [error, setError] = useState('')
@@ -24,15 +25,15 @@ export function AdminSubmissionDetailPage() {
         setDesign(row)
         setScore(row.score !== null ? String(row.score) : '')
       })
-      .catch((err) => setError(errorMessage(err)))
-  }, [id])
+      .catch((err) => setError(te(err)))
+  }, [id, te])
 
   async function saveScore(event: FormEvent) {
     event.preventDefault()
     if (!design || busy) return
     const value = Number(score)
     if (Number.isNaN(value)) {
-      setError('Enter a numeric overall score.')
+      setError(t('admin.numeric'))
       return
     }
     setBusy('save')
@@ -43,7 +44,7 @@ export function AdminSubmissionDetailPage() {
         : await api.updateScore(design.id, value)
       setDesign(updated)
     } catch (err) {
-      setError(errorMessage(err))
+      setError(te(err))
     } finally {
       setBusy(null)
     }
@@ -56,7 +57,7 @@ export function AdminSubmissionDetailPage() {
     try {
       setDesign(await api.publish(design.id))
     } catch (err) {
-      setError(errorMessage(err))
+      setError(te(err))
     } finally {
       setBusy(null)
     }
@@ -69,25 +70,25 @@ export function AdminSubmissionDetailPage() {
     try {
       setDesign(await api.unpublish(design.id))
     } catch (err) {
-      setError(errorMessage(err))
+      setError(te(err))
     } finally {
       setBusy(null)
     }
   }
 
   if (!design) {
-    return <p className={error ? 'text-danger' : 'text-mute'}>{error || 'Loading...'}</p>
+    return <p className={error ? 'text-danger' : 'text-mute'}>{error || t('designs.loading')}</p>
   }
 
   return (
     <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
       <div>
         <Link to="/admin/submissions" className="text-sm text-mute">
-          Back to submissions
+          {t('admin.backList')}
         </Link>
-        <h1 className="mt-3 text-4xl">Design {design.design_id}</h1>
+        <h1 className="mt-3 text-4xl">{t('admin.design', { id: design.design_id })}</h1>
         <div className="mt-6 rounded-[16px] border border-line bg-surface p-6">
-          <p className="text-mute">Participant</p>
+          <p className="text-mute">{t('admin.participant')}</p>
           <p className="text-2xl">{design.username}</p>
           <p className="mt-1 font-mono text-mute">{design.participant_id}</p>
           <div className="mt-6">
@@ -97,23 +98,24 @@ export function AdminSubmissionDetailPage() {
               className="mt-3 text-sm text-accent"
               onClick={() => navigator.clipboard.writeText(design.sequence)}
             >
-              Copy sequence
+              {t('admin.copy')}
             </button>
           </div>
           <div className="mt-6 grid grid-cols-2 gap-4">
             <p>
-              Length<span className="mt-1 block font-mono text-xl">{design.length} nt</span>
+              {t('seq.length')}
+              <span className="mt-1 block font-mono text-xl">{design.length} nt</span>
             </p>
             <p>
-              GC content
+              {t('seq.gc')}
               <span className="mt-1 block font-mono text-xl">{design.gc_content.toFixed(1)}%</span>
             </p>
             <p>
-              Submitted
-              <span className="mt-1 block text-mute">{formatDate(design.submitted_at)}</span>
+              {t('designs.submitted')}
+              <span className="mt-1 block text-mute">{formatDate(design.submitted_at, locale)}</span>
             </p>
             <p>
-              Status
+              {t('designs.status')}
               <span className="mt-2 block">
                 <StatusBadge status={design.status} />
               </span>
@@ -122,9 +124,9 @@ export function AdminSubmissionDetailPage() {
         </div>
       </div>
       <form onSubmit={saveScore} className="rounded-[16px] border border-line bg-surface p-6">
-        <h2 className="text-2xl">Boltz Evaluation</h2>
+        <h2 className="text-2xl">{t('admin.boltz')}</h2>
         <label className="mt-6 grid gap-2">
-          <span>Overall Score</span>
+          <span>{t('admin.overall')}</span>
           <input
             value={score}
             onChange={(event) => setScore(event.target.value)}
@@ -134,17 +136,17 @@ export function AdminSubmissionDetailPage() {
           />
         </label>
         {error ? <p className="mt-3 text-danger">{error}</p> : null}
-        <p className="mt-3 text-sm text-mute">Current score: {formatScore(design.score)}</p>
+        <p className="mt-3 text-sm text-mute">{t('admin.currentScore', { score: formatScore(design.score) })}</p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Button type="submit" disabled={busy !== null}>
-            {busy === 'save' ? 'Saving...' : 'Save'}
+            {busy === 'save' ? t('admin.saving') : t('admin.save')}
           </Button>
           <Button type="button" variant="quiet" onClick={publish} disabled={busy !== null || design.score === null}>
-            {busy === 'publish' ? 'Publishing...' : 'Publish Result'}
+            {busy === 'publish' ? t('admin.publishing') : t('admin.publish')}
           </Button>
           {design.status === 'published' ? (
             <Button type="button" variant="ghost" onClick={unpublish} disabled={busy !== null}>
-              {busy === 'unpublish' ? 'Updating...' : 'Unpublish Result'}
+              {busy === 'unpublish' ? t('admin.updating') : t('admin.unpublish')}
             </Button>
           ) : null}
         </div>

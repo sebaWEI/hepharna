@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { StatusBadge } from '../components/StatusBadge'
+import { useLocale } from '../context/LocaleContext'
 import { api } from '../services/api'
 import type { DesignPublic } from '../types'
-import { errorMessage } from '../types'
 import { formatDate, formatScore } from '../utils/rna'
 
 export function DesignsPage() {
+  const { locale, t, te } = useLocale()
   const [designs, setDesigns] = useState<DesignPublic[]>([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
@@ -15,31 +16,31 @@ export function DesignsPage() {
     api
       .myDesigns()
       .then(setDesigns)
-      .catch((err) => setError(errorMessage(err)))
+      .catch((err) => setError(te(err)))
       .finally(() => setLoading(false))
-  }, [])
+  }, [te])
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-10">
       <div className="flex items-end justify-between gap-4">
-        <h1 className="text-4xl">My Designs</h1>
+        <h1 className="text-4xl">{t('designs.title')}</h1>
         <Link to="/design" className="text-accent">
-          Design RNA
+          {t('designs.cta')}
         </Link>
       </div>
-      {loading ? <p className="mt-8 text-mute">Loading...</p> : null}
+      {loading ? <p className="mt-8 text-mute">{t('designs.loading')}</p> : null}
       {error ? <p className="mt-8 text-danger">{error}</p> : null}
       {!loading && !designs.length ? (
-        <p className="mt-8 text-mute">You have not created a design yet.</p>
+        <p className="mt-8 text-mute">{t('designs.empty')}</p>
       ) : (
         <div className="mt-8 overflow-x-auto">
           <table className="w-full min-w-[640px] text-left">
             <thead className="text-xs tracking-[0.16em] text-mute">
               <tr>
-                <th className="pb-3 font-normal">Design</th>
-                <th className="pb-3 font-normal">Score</th>
-                <th className="pb-3 font-normal">Status</th>
-                <th className="pb-3 font-normal">Date</th>
+                <th className="pb-3 font-normal">{t('designs.colDesign')}</th>
+                <th className="pb-3 font-normal">{t('designs.colScore')}</th>
+                <th className="pb-3 font-normal">{t('designs.colStatus')}</th>
+                <th className="pb-3 font-normal">{t('designs.colDate')}</th>
               </tr>
             </thead>
             <tbody>
@@ -54,7 +55,7 @@ export function DesignsPage() {
                   <td className="py-4">
                     <StatusBadge status={design.status} />
                   </td>
-                  <td className="py-4 text-mute">{formatDate(design.submitted_at ?? design.created_at)}</td>
+                  <td className="py-4 text-mute">{formatDate(design.submitted_at ?? design.created_at, locale)}</td>
                 </tr>
               ))}
             </tbody>

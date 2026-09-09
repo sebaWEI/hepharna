@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { useLocale } from '../context/LocaleContext'
 import type { FoldResult, Residue } from '../types'
 
 const BASE_COLOR: Record<string, string> = {
@@ -117,6 +118,7 @@ export function RNAStructure({
   highlight?: number[]
   className?: string
 }) {
+  const { t } = useLocale()
   const layout = useMemo(() => {
     const paired = fold.residues.map((residue) => residue.paired_to)
     const placed = untangle(
@@ -168,7 +170,7 @@ export function RNAStructure({
         viewBox={`${layout.minX} ${layout.minY} ${layout.width} ${layout.height}`}
         className="h-auto w-full"
         role="img"
-        aria-label="RNA secondary structure"
+        aria-label={t('ref.structureLabel')}
       >
         <polyline
           points={backbone}

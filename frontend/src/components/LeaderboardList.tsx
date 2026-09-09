@@ -1,5 +1,6 @@
 import { Medal } from '@phosphor-icons/react'
 import { motion, useReducedMotion } from 'motion/react'
+import { useLocale } from '../context/LocaleContext'
 import type { LeaderboardEntry } from '../types'
 import { formatScore } from '../utils/rna'
 
@@ -13,8 +14,9 @@ export function LeaderboardList({
   highlight?: string
 }) {
   const reduce = useReducedMotion()
+  const { t } = useLocale()
   if (!entries.length) {
-    return <p className="text-mute">No published scores yet. Be the first to land on the board.</p>
+    return <p className="text-mute">{t('board.empty')}</p>
   }
   return (
     <ol className="grid gap-2">

@@ -3,10 +3,11 @@ import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '../components/Button'
 import { useAuth } from '../context/AuthContext'
-import { errorMessage } from '../types'
+import { useLocale } from '../context/LocaleContext'
 
 export function RegisterPage() {
   const { register } = useAuth()
+  const { t, te } = useLocale()
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -17,7 +18,7 @@ export function RegisterPage() {
   async function onSubmit(event: FormEvent) {
     event.preventDefault()
     if (password !== confirm) {
-      setError('Passwords do not match.')
+      setError(t('register.mismatch'))
       return
     }
     setPending(true)
@@ -26,7 +27,7 @@ export function RegisterPage() {
       await register(username, password, confirm)
       navigate('/challenge')
     } catch (err) {
-      setError(errorMessage(err))
+      setError(te(err))
     } finally {
       setPending(false)
     }
@@ -34,10 +35,10 @@ export function RegisterPage() {
 
   return (
     <section className="mx-auto flex min-h-[80dvh] max-w-md flex-col justify-center px-4 py-16">
-      <h1 className="text-4xl">Create account</h1>
+      <h1 className="text-4xl">{t('register.title')}</h1>
       <form onSubmit={onSubmit} className="mt-8 grid gap-4">
         <label className="grid gap-2">
-          <span>Nickname</span>
+          <span>{t('register.nickname')}</span>
           <input
             value={username}
             onChange={(event) => setUsername(event.target.value)}
@@ -48,7 +49,7 @@ export function RegisterPage() {
           />
         </label>
         <label className="grid gap-2">
-          <span>Password</span>
+          <span>{t('register.password')}</span>
           <input
             type="password"
             value={password}
@@ -60,7 +61,7 @@ export function RegisterPage() {
           />
         </label>
         <label className="grid gap-2">
-          <span>Confirm Password</span>
+          <span>{t('register.confirm')}</span>
           <input
             type="password"
             value={confirm}
@@ -73,13 +74,13 @@ export function RegisterPage() {
         </label>
         {error ? <p className="text-danger">{error}</p> : null}
         <Button type="submit" disabled={pending}>
-          {pending ? 'Creating...' : 'Create account'}
+          {pending ? t('register.pending') : t('register.submit')}
         </Button>
       </form>
       <p className="mt-6 text-mute">
-        Already registered?{' '}
+        {t('register.hasAccount')}{' '}
         <Link to="/login" className="text-accent">
-          Login
+          {t('login.submit')}
         </Link>
       </p>
     </section>

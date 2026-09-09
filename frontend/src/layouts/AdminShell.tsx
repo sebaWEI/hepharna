@@ -1,14 +1,16 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { LanguageToggle } from '../components/LanguageToggle'
 import { useAuth } from '../context/AuthContext'
-
-const links = [
-  { to: '/admin', label: 'Dashboard', end: true },
-  { to: '/admin/submissions', label: 'Submissions', end: false },
-  { to: '/admin/users', label: 'Users', end: false },
-]
+import { useLocale } from '../context/LocaleContext'
 
 export function AdminShell() {
   const { user } = useAuth()
+  const { t } = useLocale()
+  const links = [
+    { to: '/admin', label: t('admin.navDashboard'), end: true },
+    { to: '/admin/submissions', label: t('admin.navSubmissions'), end: false },
+    { to: '/admin/users', label: t('admin.navUsers'), end: false },
+  ]
   return (
     <div className="min-h-[100dvh] bg-bg text-ink">
       <header className="border-b border-line">
@@ -28,8 +30,9 @@ export function AdminShell() {
               </NavLink>
             ))}
             <NavLink to="/challenge" className="hover:text-ink">
-              Back to challenge
+              {t('admin.backChallenge')}
             </NavLink>
+            <LanguageToggle />
             <span className="font-mono">{user?.username}</span>
           </div>
         </div>

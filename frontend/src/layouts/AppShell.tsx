@@ -1,20 +1,23 @@
 import { Cube, SignOut } from '@phosphor-icons/react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { LanguageToggle } from '../components/LanguageToggle'
 import { useAuth } from '../context/AuthContext'
-
-const links = [
-  { to: '/', label: 'Home' },
-  { to: '/challenge', label: 'Challenge' },
-  { to: '/reference', label: 'HEPHA RNA' },
-  { to: '/leaderboard', label: 'Leaderboard' },
-  { to: '/minecraft', label: 'SynBio Crafter' },
-]
+import { useLocale } from '../context/LocaleContext'
 
 export function AppShell() {
   const { user, logout } = useAuth()
+  const { t } = useLocale()
   const location = useLocation()
   const kiosk = new URLSearchParams(location.search).get('kiosk') === '1'
   if (kiosk) return <Outlet />
+
+  const links = [
+    { to: '/', label: t('nav.home') },
+    { to: '/challenge', label: t('nav.challenge') },
+    { to: '/reference', label: t('nav.hepha') },
+    { to: '/leaderboard', label: t('nav.leaderboard') },
+    { to: '/minecraft', label: t('nav.minecraft') },
+  ]
 
   return (
     <div className="min-h-[100dvh] bg-bg text-ink">
@@ -35,22 +38,23 @@ export function AppShell() {
             ))}
             {user?.role === 'admin' ? (
               <NavLink to="/admin" className="hover:text-ink">
-                Admin
+                {t('nav.admin')}
               </NavLink>
             ) : null}
           </nav>
           <div className="flex items-center gap-3 text-sm">
+            <LanguageToggle />
             {user ? (
               <>
                 <span className="hidden font-mono text-mute sm:inline">{user.participant_id}</span>
                 <button onClick={logout} className="inline-flex items-center gap-1 text-mute hover:text-ink">
                   <SignOut size={16} />
-                  Log out
+                  {t('nav.logout')}
                 </button>
               </>
             ) : (
               <NavLink to="/login" className="rounded-full bg-accent px-4 py-2 text-bg">
-                Join Challenge
+                {t('nav.login')}
               </NavLink>
             )}
           </div>
@@ -69,7 +73,7 @@ export function AppShell() {
       <footer className="border-t border-line/80 px-4 py-8 text-center text-sm text-mute">
         <p className="inline-flex items-center gap-2">
           <Cube size={16} />
-          iGEM HEPHA-RNA Design Challenge
+          {t('nav.footer')}
         </p>
       </footer>
     </div>

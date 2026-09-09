@@ -3,16 +3,17 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '../components/Button'
 import { RNAStructure } from '../components/RNAStructure'
 import { SequenceEditor } from '../components/SequenceEditor'
+import { useLocale } from '../context/LocaleContext'
 import { useChallengeConfig } from '../hooks/useChallengeConfig'
 import { api } from '../services/api'
 import type { DesignPublic, FoldResult } from '../types'
-import { errorMessage } from '../types'
 import { validateSequence } from '../utils/rna'
 
 type Mode = 'scratch' | 'reference'
 
 export function DesignPage() {
   const navigate = useNavigate()
+  const { t, te } = useLocale()
   const { config } = useChallengeConfig()
   const [mode, setMode] = useState<Mode>('scratch')
   const [sequence, setSequence] = useState('')
@@ -40,6 +41,7 @@ export function DesignPage() {
 
   const parsed = validateSequence(sequence, config.min_rna_length, config.max_rna_length)
   const lengthDelta = parsed.sequence.length - (config.reference_rna_sequence?.length ?? 0)
+  const deltaLabel = `${lengthDelta >= 0 ? `+${lengthDelta}` : lengthDelta}`
 
   function chooseMode(next: Mode) {
     setMode(next)
@@ -61,9 +63,9 @@ export function DesignPage() {
         : await api.saveDraft(sequence)
       setDraft(saved)
       setSequence(saved.sequence)
-      setMessage('Draft saved.')
+      setMessage(t('design.saved'))
     } catch (err) {
-      setError(errorMessage(err))
+      setError(te(err))
     } finally {
       setSaving(false)
     }
@@ -80,7 +82,7 @@ export function DesignPage() {
       const result = await api.submit(saved.id)
       navigate('/challenge', { state: { submitted: result.design } })
     } catch (err) {
-      setError(errorMessage(err))
+      setError(te(err))
     } finally {
       setSubmitting(false)
     }
@@ -93,7 +95,7 @@ export function DesignPage() {
     try {
       setUserFold(await api.fold(sequence))
     } catch (err) {
-      setError(errorMessage(err))
+      setError(te(err))
     } finally {
       setFolding(false)
     }
@@ -101,23 +103,20 @@ export function DesignPage() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="text-4xl md:text-5xl">Design your HEPHA-RNA</h1>
-      <p className="mt-3 max-w-[56ch] text-mute">
-        Start from scratch, or edit the HEPHA reference. You can mutate bases and insert or delete
-        nucleotides. Click preview to fold with ViennaRNA.
-      </p>
+      <h1 className="text-4xl md:text-5xl">{t('design.title')}</h1>
+      <p className="mt-3 max-w-[56ch] text-mute">{t('design.intro')}</p>
       <div className="mt-6 flex flex-wrap gap-3">
         <Button variant={mode === 'scratch' ? 'primary' : 'ghost'} onClick={() => chooseMode('scratch')}>
-          Design from scratch
+          {t('design.scratch')}
         </Button>
         <Button
           variant={mode === 'reference' ? 'primary' : 'ghost'}
           onClick={() => chooseMode('reference')}
         >
-          Edit HEPHA reference
+          {t('design.reference')}
         </Button>
         <Link to="/reference" className="inline-flex items-center text-sm text-accent">
-          View HEPHA structure
+          {t('design.viewStructure')}
         </Link>
       </div>
       <div className="mt-8">
@@ -133,32 +132,32 @@ export function DesignPage() {
       </div>
       {mode === 'reference' && config.reference_rna_sequence ? (
         <p className="mt-3 text-sm text-mute">
-          vs HEPHA: {lengthDelta >= 0 ? `+${lengthDelta}` : lengthDelta} nt
+          {t('design.vsHepha', { delta: deltaLabel })}
           {userFold && userFold.length_delta === 0
-            ? `, ${userFold.substitutions ?? 0} substitution(s)`
+            ? t('design.substitutions', { n: userFold.substitutions ?? 0 })
             : ''}
         </p>
       ) : null}
       {error ? <p className="mt-4 text-danger">{error}</p> : null}
       {message ? <p className="mt-4 text-accent">{message}</p> : null}
       {!config.challenge_open ? (
-        <p className="mt-4 text-warn">The challenge is closed for new submissions.</p>
+        <p className="mt-4 text-warn">{t('design.closed')}</p>
       ) : null}
       <div className="mt-6 flex flex-wrap gap-3">
         <Button variant="quiet" onClick={previewStructure} disabled={folding || !parsed.valid}>
-          {folding ? 'Folding...' : 'Preview secondary structure'}
+          {folding ? t('design.folding') : t('design.preview')}
         </Button>
         <Button variant="ghost" onClick={saveDraft} disabled={saving || !parsed.valid}>
-          {saving ? 'Saving...' : 'Save draft'}
+          {saving ? t('design.saving') : t('design.save')}
         </Button>
         <Button onClick={submit} disabled={submitting || !parsed.valid || !config.challenge_open}>
-          {submitting ? 'Submitting...' : 'Submit Design'}
+          {submitting ? t('design.submitting') : t('design.submit')}
         </Button>
       </div>
       <div className="mt-10 grid gap-6 lg:grid-cols-2">
         <div>
-          <h2 className="text-xl">HEPHA reference</h2>
-          <p className="mt-1 text-sm text-mute">ViennaRNA MFE structure</p>
+          <h2 className="text-xl">{t('design.refTitle')}</h2>
+          <p className="mt-1 text-sm text-mute">{t('design.refHint')}</p>
           {referenceFold ? (
             <>
               <p className="mt-3 font-mono text-sm text-mute">
@@ -167,12 +166,12 @@ export function DesignPage() {
               <RNAStructure fold={referenceFold} className="mt-4" />
             </>
           ) : (
-            <p className="mt-4 text-mute">Loading reference fold...</p>
+            <p className="mt-4 text-mute">{t('design.refLoading')}</p>
           )}
         </div>
         <div>
-          <h2 className="text-xl">Your design</h2>
-          <p className="mt-1 text-sm text-mute">Click preview after you edit the sequence</p>
+          <h2 className="text-xl">{t('design.yours')}</h2>
+          <p className="mt-1 text-sm text-mute">{t('design.yoursHint')}</p>
           {userFold ? (
             <>
               <p className="mt-3 font-mono text-sm text-mute">
@@ -185,7 +184,7 @@ export function DesignPage() {
               />
             </>
           ) : (
-            <p className="mt-4 text-mute">No preview yet.</p>
+            <p className="mt-4 text-mute">{t('design.noPreview')}</p>
           )}
         </div>
       </div>
