@@ -11,6 +11,8 @@ const fallback: ChallengeConfig = {
   challenge_open: true,
   minecraft_server_address: '',
   minecraft_info: '',
+  reference_rna_sequence: '',
+  reference_rna_name: 'HEPHA',
 }
 
 export function useChallengeConfig() {

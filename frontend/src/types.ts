@@ -77,6 +77,28 @@ export type ChallengeConfig = {
   challenge_open: boolean
   minecraft_server_address: string
   minecraft_info: string
+  reference_rna_sequence: string
+  reference_rna_name: string
+}
+
+export type Residue = {
+  index: number
+  base: string
+  x: number
+  y: number
+  paired_to: number | null
+}
+
+export type FoldResult = {
+  sequence: string
+  structure: string
+  mfe: number
+  length: number
+  gc_content: number
+  residues: Residue[]
+  length_delta: number | null
+  substitutions: number | null
+  changed_positions: number[] | null
 }
 
 export type AdminDashboard = {

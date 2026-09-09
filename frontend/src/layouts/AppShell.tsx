@@ -5,8 +5,9 @@ import { useAuth } from '../context/AuthContext'
 const links = [
   { to: '/', label: 'Home' },
   { to: '/challenge', label: 'Challenge' },
+  { to: '/reference', label: 'HEPHA RNA' },
   { to: '/leaderboard', label: 'Leaderboard' },
-  { to: '/minecraft', label: 'Minecraft Bio Lab' },
+  { to: '/minecraft', label: 'SynBio Crafter' },
 ]
 
 export function AppShell() {

@@ -9,7 +9,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import PROJECT_ROOT, get_settings
 from app.database import init_db
-from app.routers import admin, auth, config, designs, leaderboard, me
+from app.routers import admin, auth, config, designs, fold, leaderboard, me
 
 
 @asynccontextmanager
@@ -55,6 +55,7 @@ app.include_router(designs.router)
 app.include_router(leaderboard.router)
 app.include_router(admin.router)
 app.include_router(config.router)
+app.include_router(fold.router)
 
 
 def mount_frontend(application: FastAPI) -> None:

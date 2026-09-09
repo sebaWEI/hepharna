@@ -57,3 +57,5 @@ class ChallengeConfig(BaseModel):
     challenge_open: bool
     minecraft_server_address: str
     minecraft_info: str
+    reference_rna_sequence: str
+    reference_rna_name: str = "HEPHA"

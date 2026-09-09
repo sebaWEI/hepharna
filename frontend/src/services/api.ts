@@ -6,6 +6,7 @@ import type {
   ChallengeConfig,
   CurrentDesignResponse,
   DesignPublic,
+  FoldResult,
   LeaderboardResponse,
   UserPublic,
 } from '../types'
@@ -78,6 +79,15 @@ export const api = {
   },
   config() {
     return request<ChallengeConfig>('/api/challenge/config')
+  },
+  fold(sequence: string) {
+    return request<FoldResult>('/api/rna/fold', {
+      method: 'POST',
+      body: JSON.stringify({ sequence }),
+    })
+  },
+  referenceFold() {
+    return request<FoldResult>('/api/rna/reference')
   },
   currentDesign() {
     return request<CurrentDesignResponse>('/api/me/current-design')

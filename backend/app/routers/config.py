@@ -21,6 +21,8 @@ def get_challenge_config() -> ChallengeConfig:
         challenge_open=challenge_is_open(),
         minecraft_server_address=settings.minecraft_server_address,
         minecraft_info=settings.minecraft_info,
+        reference_rna_sequence=settings.reference_rna_sequence,
+        reference_rna_name="HEPHA",
     )
 
 

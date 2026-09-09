@@ -28,7 +28,7 @@ export function LandingPage() {
           </Link>
         </div>
         <Link to="/minecraft" className="mt-5 inline-block text-sm text-mute hover:text-accent">
-          Minecraft Bio Lab
+          SynBio Crafter
         </Link>
       </div>
       <div className="rounded-[16px] border border-line bg-surface p-6 md:p-8">

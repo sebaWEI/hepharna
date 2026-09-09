@@ -23,8 +23,13 @@ class Settings(BaseSettings):
     frontend_url: str = "http://localhost:3000"
 
     min_rna_length: int = 10
-    max_rna_length: int = 100
+    max_rna_length: int = 250
     max_submissions_per_user: int = 5
+    reference_rna_sequence: str = (
+        "CAGUGCUAGAGGAGGUCAGAAGAGGGCAUUGGAUCCCCCAGAACUGGAGUUAUACGGUAACCUC"
+        "GUGGUGGUGCGCAGCCACCAUGUGGAUGGAUAUUGAGUUCCAAACACUGGUCCUGUGCAAGAGC"
+        "AUCCAGUGCUCUUAAGUGCUGAGCCAUCUCUUUAGCUCC"
+    )
 
     challenge_start_time: datetime | None = None
     challenge_end_time: datetime | None = None
@@ -48,6 +53,13 @@ class Settings(BaseSettings):
         if value is None:
             return ""
         return str(value).strip()
+
+    @field_validator("reference_rna_sequence", mode="before")
+    @classmethod
+    def normalize_reference(cls, value):
+        if not value:
+            return value
+        return "".join(str(value).split()).upper()
 
     def sqlite_path(self) -> Path:
         url = self.database_url

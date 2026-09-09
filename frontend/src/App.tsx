@@ -16,6 +16,7 @@ import { LandingPage } from './pages/Landing'
 import { LeaderboardPage } from './pages/Leaderboard'
 import { LoginPage } from './pages/Login'
 import { MinecraftPage } from './pages/Minecraft'
+import { ReferencePage } from './pages/Reference'
 import { RegisterPage } from './pages/Register'
 
 export default function App() {
@@ -28,6 +29,7 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/leaderboard" element={<LeaderboardPage />} />
+            <Route path="/reference" element={<ReferencePage />} />
             <Route path="/minecraft" element={<MinecraftPage />} />
             <Route path="/forbidden" element={<ForbiddenPage />} />
             <Route element={<RequireAuth />}>

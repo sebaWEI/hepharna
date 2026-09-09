@@ -30,7 +30,7 @@ def gc_content(sequence: str) -> float:
     return round(gc / len(sequence) * 100, 1)
 
 
-def validate_sequence(raw: str) -> SequenceStats:
+def validate_sequence(raw: str, *, enforce_length: bool = True) -> SequenceStats:
     settings = get_settings()
     sequence = normalize_sequence(raw)
     if not sequence:
@@ -48,11 +48,11 @@ def validate_sequence(raw: str) -> SequenceStats:
         )
 
     length = len(sequence)
-    if length < settings.min_rna_length:
+    if enforce_length and length < settings.min_rna_length:
         raise SequenceValidationError(
             f"Sequence is too short. Minimum length is {settings.min_rna_length} nt."
         )
-    if length > settings.max_rna_length:
+    if enforce_length and length > settings.max_rna_length:
         raise SequenceValidationError(
             f"Sequence is too long. Maximum length is {settings.max_rna_length} nt."
         )
