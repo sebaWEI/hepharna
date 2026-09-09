@@ -4,10 +4,10 @@ After=network.target
 
 [Service]
 Type=simple
-User=ubuntu
-WorkingDirectory=/hepharna/backend
-EnvironmentFile=/hepharna/.env
-ExecStart=/hepharna/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 3000
+User=root
+WorkingDirectory=/root/hepha_rna/backend
+EnvironmentFile=/root/hepha_rna/.env
+ExecStart=/root/hepha_rna/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 3000
 Restart=always
 RestartSec=3
 
