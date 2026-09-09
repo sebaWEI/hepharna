@@ -4,7 +4,7 @@ import type { ChallengeConfig } from '../types'
 
 const fallback: ChallengeConfig = {
   min_rna_length: 10,
-  max_rna_length: 100,
+  max_rna_length: 200,
   max_submissions_per_user: 5,
   challenge_start_time: null,
   challenge_end_time: null,

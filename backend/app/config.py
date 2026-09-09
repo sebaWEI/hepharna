@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     frontend_url: str = "http://localhost:3000"
 
     min_rna_length: int = 10
-    max_rna_length: int = 250
+    max_rna_length: int = 200
     max_submissions_per_user: int = 5
     reference_rna_sequence: str = (
         "CAGUGCUAGAGGAGGUCAGAAGAGGGCAUUGGAUCCCCCAGAACUGGAGUUAUACGGUAACCUC"

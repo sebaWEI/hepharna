@@ -26,7 +26,7 @@ export function RNAStructure({
     const maxY = Math.max(...ys)
     const width = Math.max(maxX - minX, 1)
     const height = Math.max(maxY - minY, 1)
-    const pad = 18
+    const pad = 28
     const distances: number[] = []
     for (let i = 0; i < fold.residues.length - 1; i += 1) {
       const dx = fold.residues[i + 1].x - fold.residues[i].x
@@ -98,6 +98,18 @@ export function RNAStructure({
             >
               {residue.base}
             </text>
+            {(residue.index + 1) % 5 === 1 ? (
+              <text
+                x={residue.x}
+                y={residue.y - layout.radius * 2.15}
+                textAnchor="middle"
+                fontFamily="JetBrains Mono, ui-monospace, monospace"
+                fontSize={Math.max(6, layout.radius * 0.95)}
+                fill="#8aa396"
+              >
+                {residue.index + 1}
+              </text>
+            ) : null}
           </g>
         ))}
       </svg>
