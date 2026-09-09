@@ -1,0 +1,58 @@
+@import "@fontsource-variable/outfit";
+@import "@fontsource/jetbrains-mono";
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit Variable", "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --color-bg: #0c1210;
+  --color-surface: #141c18;
+  --color-raised: #1b2621;
+  --color-line: #2c3d36;
+  --color-ink: #e7f1ec;
+  --color-mute: #8aa396;
+  --color-accent: #3db89a;
+  --color-accent-dim: #2a7f6a;
+  --color-danger: #d46757;
+  --color-warn: #d4a84b;
+  --color-base-a: #d4a84b;
+  --color-base-u: #5aa8b8;
+  --color-base-g: #d46757;
+  --color-base-c: #6f8fbf;
+  --radius-card: 16px;
+  --radius-input: 8px;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  letter-spacing: 0.01em;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+
+input,
+textarea,
+button {
+  font-family: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
