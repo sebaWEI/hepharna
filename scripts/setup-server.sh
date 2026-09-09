@@ -15,6 +15,22 @@ if ! python3 -m venv --help >/dev/null 2>&1; then
   apt-get install -y python3-venv python3-pip
 fi
 
+need_node=0
+if ! command -v npm >/dev/null 2>&1; then
+  need_node=1
+elif ! node -e 'process.exit(Number(process.versions.node.split(".")[0]) < 20)'; then
+  echo "Node $(node -v) is too old. Installing Node 22..."
+  need_node=1
+fi
+
+if [[ "$need_node" -eq 1 ]]; then
+  echo "Installing Node.js 22..."
+  apt-get update
+  apt-get install -y ca-certificates curl gnupg
+  curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+  apt-get install -y nodejs
+fi
+
 venv_ok=0
 if [[ -x "$ROOT/.venv/bin/python" ]] && "$ROOT/.venv/bin/python" -c 'import sys; raise SystemExit(sys.platform != "linux")'; then
   venv_ok=1
