@@ -158,12 +158,12 @@ export function AdminSubmissionDetailPage() {
   }
 
   return (
-    <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-      <div>
+    <section className="grid min-w-0 gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="min-w-0">
         <Link to="/admin/submissions" className="text-sm text-mute">
           {t('admin.backList')}
         </Link>
-        <h1 className="mt-3 text-4xl">{t('admin.design', { id: design.design_id })}</h1>
+        <h1 className="mt-3 break-all text-4xl">{t('admin.design', { id: design.design_id })}</h1>
         <div className="mt-6 rounded-[16px] border border-line bg-surface p-6">
           <p className="text-mute">{t('admin.participant')}</p>
           <p className="text-2xl">{design.username}</p>
@@ -204,17 +204,17 @@ export function AdminSubmissionDetailPage() {
           </div>
         ) : null}
       </div>
-      <div className="grid gap-6">
-        <form onSubmit={saveScore} className="rounded-[16px] border border-line bg-surface p-6">
+      <div className="grid min-w-0 gap-6">
+        <form onSubmit={saveScore} className="min-w-0 overflow-hidden rounded-[16px] border border-line bg-surface p-5 sm:p-6">
           <h2 className="text-2xl">{t('admin.boltz')}</h2>
           <p className="mt-2 text-sm text-mute">{t('admin.scoreHint')}</p>
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
-            <label className="grid gap-2">
-              <span>{t('admin.plddt')}</span>
+          <div className="mt-6 grid grid-cols-1 gap-4">
+            <label className="grid min-w-0 gap-2">
+              <span className="text-sm">{t('admin.plddt')}</span>
               <input
                 value={plddt}
                 onChange={(event) => setPlddt(event.target.value)}
-                className="rounded-[8px] border border-line bg-raised px-3 py-3 font-mono text-2xl outline-none focus:border-accent"
+                className="w-full min-w-0 rounded-[8px] border border-line bg-raised px-3 py-3 font-mono text-xl outline-none focus:border-accent"
                 inputMode="decimal"
                 step="any"
                 min={0}
@@ -222,12 +222,12 @@ export function AdminSubmissionDetailPage() {
                 required
               />
             </label>
-            <label className="grid gap-2">
-              <span>{t('admin.iptm')}</span>
+            <label className="grid min-w-0 gap-2">
+              <span className="text-sm">{t('admin.iptm')}</span>
               <input
                 value={iptm}
                 onChange={(event) => setIptm(event.target.value)}
-                className="rounded-[8px] border border-line bg-raised px-3 py-3 font-mono text-2xl outline-none focus:border-accent"
+                className="w-full min-w-0 rounded-[8px] border border-line bg-raised px-3 py-3 font-mono text-xl outline-none focus:border-accent"
                 inputMode="decimal"
                 step="any"
                 min={0}
@@ -238,10 +238,10 @@ export function AdminSubmissionDetailPage() {
           </div>
           <div className="mt-4 rounded-[12px] bg-raised px-4 py-3">
             <p className="text-xs text-mute">{t('admin.total')}</p>
-            <p className="font-mono text-3xl">{formatScore(previewTotal ?? design.score)}</p>
+            <p className="break-all font-mono text-3xl">{formatScore(previewTotal ?? design.score)}</p>
           </div>
           {error ? <p className="mt-3 text-danger">{error}</p> : null}
-          <p className="mt-3 text-sm text-mute">
+          <p className="mt-3 break-words text-sm text-mute">
             {t('admin.currentScore', { score: formatScore(design.score) })}
             {design.scores?.plddt != null && design.scores?.iptm != null
               ? ` · pLDDT ${formatScore(design.scores.plddt)} · ipTM ${formatScore(design.scores.iptm)}`
@@ -262,15 +262,15 @@ export function AdminSubmissionDetailPage() {
           </div>
         </form>
 
-        <div className="rounded-[16px] border border-line bg-surface p-6">
+        <div className="min-w-0 overflow-hidden rounded-[16px] border border-line bg-surface p-5 sm:p-6">
           <h2 className="text-2xl">{t('structure.uploadTitle')}</h2>
           <p className="mt-2 text-sm text-mute">{t('structure.uploadHint')}</p>
-          <div className="mt-4 flex flex-wrap items-center gap-3">
+          <div className="mt-4 flex min-w-0 flex-wrap items-center gap-3">
             <input
               ref={fileRef}
               type="file"
               accept=".pdb,.cif,.mmcif,chemical/x-pdb,chemical/x-cif"
-              className="text-sm text-mute file:mr-3 file:rounded-full file:border-0 file:bg-accent file:px-4 file:py-2 file:text-bg"
+              className="max-w-full text-sm text-mute file:mr-3 file:rounded-full file:border-0 file:bg-accent file:px-4 file:py-2 file:text-bg"
               disabled={busy !== null}
               onChange={(event) => onUploadStructure(event.target.files?.[0] ?? null)}
             />
@@ -282,7 +282,7 @@ export function AdminSubmissionDetailPage() {
           </div>
           {busy === 'upload' ? <p className="mt-3 text-sm text-mute">{t('structure.uploading')}</p> : null}
           {design.has_structure ? (
-            <p className="mt-3 font-mono text-sm text-mute">{design.structure_filename}</p>
+            <p className="mt-3 break-all font-mono text-sm text-mute">{design.structure_filename}</p>
           ) : (
             <p className="mt-3 text-sm text-mute">{t('structure.none')}</p>
           )}

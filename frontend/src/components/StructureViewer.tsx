@@ -15,6 +15,7 @@ type MolViewer = {
   zoomTo: () => void
   render: () => void
   clear: () => void
+  resize?: () => void
 }
 
 export function StructureViewer({ designId, filename, className = '' }: Props) {
@@ -51,6 +52,15 @@ export function StructureViewer({ designId, filename, className = '' }: Props) {
         viewer.setStyle({}, { cartoon: { color: 'spectrum' }, stick: { radius: 0.12 } })
         viewer.zoomTo()
         viewer.render()
+        // Ensure canvas size matches the relative host after layout.
+        requestAnimationFrame(() => {
+          try {
+            viewer?.resize?.()
+            viewer?.render()
+          } catch {
+            /* ignore */
+          }
+        })
       } catch {
         if (!cancelled) setError(t('structure.loadFailed'))
       } finally {
@@ -72,22 +82,33 @@ export function StructureViewer({ designId, filename, className = '' }: Props) {
   return (
     <div className={`overflow-hidden rounded-[16px] border border-line bg-raised ${className}`}>
       <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
-        <div>
+        <div className="min-w-0">
           <p className="text-sm">{t('structure.title')}</p>
-          <p className="font-mono text-xs text-mute">{filename || t('structure.unnamed')}</p>
+          <p className="truncate font-mono text-xs text-mute">{filename || t('structure.unnamed')}</p>
         </div>
         <button
           type="button"
-          className="inline-flex items-center gap-1 text-sm text-accent"
+          className="inline-flex shrink-0 items-center gap-1 text-sm text-accent"
           onClick={() => api.downloadStructure(designId, filename)}
         >
           <DownloadSimple size={16} />
           {t('structure.download')}
         </button>
       </div>
-      {loading ? <p className="px-4 py-8 text-sm text-mute">{t('structure.loading')}</p> : null}
-      {error ? <p className="px-4 py-8 text-sm text-danger">{error}</p> : null}
-      <div ref={host} className="h-[360px] w-full" style={{ display: error ? 'none' : 'block' }} />
+      <div className="relative h-[360px] w-full">
+        {loading ? (
+          <p className="absolute inset-0 z-10 flex items-center justify-center bg-raised text-sm text-mute">
+            {t('structure.loading')}
+          </p>
+        ) : null}
+        {error ? (
+          <p className="absolute inset-0 z-10 flex items-center justify-center bg-raised px-4 text-center text-sm text-danger">
+            {error}
+          </p>
+        ) : null}
+        {/* position:relative is required — 3Dmol canvas is absolute;top/left:0 */}
+        <div ref={host} className="absolute inset-0 h-full w-full" />
+      </div>
     </div>
   )
 }
