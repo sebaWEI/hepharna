@@ -1,7 +1,7 @@
 from collections.abc import Generator
 from pathlib import Path
 
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.config import BACKEND_DIR, get_settings
@@ -48,8 +48,37 @@ def get_db() -> Generator[Session, None, None]:
         db.close()
 
 
+def _column_names(table: str) -> set[str]:
+    with engine.connect() as conn:
+        rows = conn.execute(text(f"PRAGMA table_info({table})")).fetchall()
+    return {row[1] for row in rows}
+
+
+def _ensure_column(table: str, column: str, ddl: str) -> None:
+    if column in _column_names(table):
+        return
+    with engine.begin() as conn:
+        conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {ddl}"))
+
+
+def migrate_schema() -> None:
+    """Add columns introduced after the first release (SQLite has no Alembic yet)."""
+    if not str(engine.url).startswith("sqlite"):
+        return
+    existing = {row[0] for row in engine.connect().execute(text(
+        "SELECT name FROM sqlite_master WHERE type='table'"
+    ))}
+    if "users" in existing:
+        _ensure_column("users", "email", "email VARCHAR(255)")
+    if "designs" in existing:
+        _ensure_column("designs", "structure_filename", "structure_filename VARCHAR(255)")
+        _ensure_column("designs", "structure_path", "structure_path VARCHAR(512)")
+
+
 def init_db() -> None:
     from app import models  # noqa: F401
 
     Path(BACKEND_DIR / "data").mkdir(parents=True, exist_ok=True)
+    Path(BACKEND_DIR / "data" / "structures").mkdir(parents=True, exist_ok=True)
     Base.metadata.create_all(bind=engine)
+    migrate_schema()

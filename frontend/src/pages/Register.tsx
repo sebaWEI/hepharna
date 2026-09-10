@@ -10,6 +10,7 @@ export function RegisterPage() {
   const { t, te } = useLocale()
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
@@ -24,7 +25,7 @@ export function RegisterPage() {
     setPending(true)
     setError('')
     try {
-      await register(username, password, confirm)
+      await register(username, email, password, confirm)
       navigate('/challenge')
     } catch (err) {
       setError(te(err))
@@ -36,6 +37,7 @@ export function RegisterPage() {
   return (
     <section className="mx-auto flex min-h-[80dvh] max-w-md flex-col justify-center px-4 py-16">
       <h1 className="text-4xl">{t('register.title')}</h1>
+      <p className="mt-3 text-sm text-mute">{t('register.emailHint')}</p>
       <form onSubmit={onSubmit} className="mt-8 grid gap-4">
         <label className="grid gap-2">
           <span>{t('register.nickname')}</span>
@@ -45,6 +47,17 @@ export function RegisterPage() {
             className="rounded-[8px] border border-line bg-raised px-3 py-3 outline-none focus:border-accent"
             autoComplete="username"
             minLength={2}
+            required
+          />
+        </label>
+        <label className="grid gap-2">
+          <span>{t('register.email')}</span>
+          <input
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            className="rounded-[8px] border border-line bg-raised px-3 py-3 outline-none focus:border-accent"
+            autoComplete="email"
             required
           />
         </label>

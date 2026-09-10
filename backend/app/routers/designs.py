@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session, joinedload
 
 from app.auth.deps import get_current_user
@@ -13,6 +14,7 @@ from app.services.ids import make_design_id, next_design_version
 from app.services.leaderboard import rank_for_user
 from app.services.rna import SequenceValidationError, validate_sequence
 from app.services.serialize import serialize_design
+from app.services.structures import resolve_structure_path
 
 router = APIRouter(prefix="/api/designs", tags=["designs"])
 
@@ -81,6 +83,24 @@ def get_design(
     design = _owned_design(db, design_pk, user)
     rank, _ = rank_for_user(db, design.user_id)
     return serialize_design(design, rank if design.status == "published" else None)
+
+
+@router.get("/{design_pk}/structure")
+def download_structure(
+    design_pk: int,
+    user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[Session, Depends(get_db)],
+):
+    design = _owned_design(db, design_pk, user)
+    path = resolve_structure_path(design.structure_path)
+    if path is None:
+        raise HTTPException(status_code=404, detail="No structure file uploaded for this design.")
+    media = "chemical/x-pdb" if path.suffix.lower() == ".pdb" else "chemical/x-cif"
+    return FileResponse(
+        path,
+        media_type=media,
+        filename=design.structure_filename or path.name,
+    )
 
 
 @router.put("/{design_pk}", response_model=DesignPublic)

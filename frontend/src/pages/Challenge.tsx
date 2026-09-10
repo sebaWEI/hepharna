@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { LeaderboardList } from '../components/LeaderboardList'
 import { SequenceDisplay } from '../components/SequenceDisplay'
 import { StatusBadge } from '../components/StatusBadge'
+import { StructureViewer } from '../components/StructureViewer'
 import { useAuth } from '../context/AuthContext'
 import { useLocale } from '../context/LocaleContext'
 import { useLeaderboard } from '../hooks/useLeaderboard'
@@ -51,16 +52,27 @@ export function ChallengePage() {
             <div className="mt-5 grid gap-5">
               <SequenceDisplay sequence={design.sequence} />
               <StatusBadge status={design.status} />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 <div>
-                  <p className="text-xs text-mute">{t('challenge.score')}</p>
-                  <p className="font-mono text-5xl">{formatScore(score)}</p>
+                  <p className="text-xs text-mute">{t('admin.plddt')}</p>
+                  <p className="font-mono text-3xl">{formatScore(design.scores?.plddt)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-mute">{t('admin.iptm')}</p>
+                  <p className="font-mono text-3xl">{formatScore(design.scores?.iptm)}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-mute">{t('admin.total')}</p>
+                  <p className="font-mono text-3xl text-accent">{formatScore(score)}</p>
                 </div>
                 <div>
                   <p className="text-xs text-mute">{t('challenge.rank')}</p>
-                  <p className="font-mono text-5xl">{rank ? `#${rank}` : '-'}</p>
+                  <p className="font-mono text-3xl">{rank ? `#${rank}` : '-'}</p>
                 </div>
               </div>
+              {design.has_structure ? (
+                <StructureViewer designId={design.id} filename={design.structure_filename} />
+              ) : null}
             </div>
           ) : (
             <p className="mt-5 text-mute">{t('challenge.empty')}</p>

@@ -78,6 +78,7 @@ export function validateSequence(
 
 export function formatScore(score: number | null | undefined): string {
   if (score === null || score === undefined) return '-'
+  if (Math.abs(score) <= 1) return score.toFixed(4)
   return score.toFixed(2)
 }
 

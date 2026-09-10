@@ -44,12 +44,15 @@ def leaderboard_entries(db: Session, limit: int | None = None) -> list[Leaderboa
         ranked = ranked[:limit]
     entries: list[LeaderboardEntry] = []
     for index, (user, design, score) in enumerate(ranked, start=1):
+        score_row = design.score
         entries.append(
             LeaderboardEntry(
                 rank=index,
                 username=user.username,
                 participant_id=user.participant_id,
                 score=score,
+                plddt=score_row.structure_score if score_row else None,
+                iptm=score_row.interface_score if score_row else None,
                 design_id=design.design_id,
                 published_at=design.published_at,
             )

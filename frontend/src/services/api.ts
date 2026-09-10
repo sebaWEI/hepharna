@@ -58,11 +58,12 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 
 export const api = {
-  register(username: string, password: string, confirmPassword: string) {
+  register(username: string, email: string, password: string, confirmPassword: string) {
     return request<{ access_token: string; user: UserPublic }>('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify({
         username,
+        email,
         password,
         confirm_password: confirmPassword,
       }),
@@ -97,6 +98,37 @@ export const api = {
   },
   getDesign(id: number) {
     return request<DesignPublic>(`/api/designs/${id}`)
+  },
+  structureUrl(id: number) {
+    return `/api/designs/${id}/structure`
+  },
+  async structureText(id: number) {
+    const token = getToken()
+    const response = await fetch(`/api/designs/${id}/structure`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    })
+    if (!response.ok) {
+      throw new ApiError(response.status, 'Could not load structure file.')
+    }
+    return response.text()
+  },
+  async downloadStructure(id: number, filename?: string | null) {
+    const token = getToken()
+    const response = await fetch(`/api/designs/${id}/structure`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    })
+    if (!response.ok) {
+      throw new ApiError(response.status, 'Could not download structure file.')
+    }
+    const blob = await response.blob()
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename || `structure-${id}.cif`
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
   },
   saveDraft(sequence: string) {
     return request<DesignPublic>('/api/designs', {
@@ -136,16 +168,37 @@ export const api = {
   adminSubmission(id: number) {
     return request<AdminSubmission>(`/api/admin/submissions/${id}`)
   },
-  saveScore(id: number, overallScore: number) {
+  saveScore(id: number, plddt: number, iptm: number) {
     return request<AdminSubmission>(`/api/admin/submissions/${id}/score`, {
       method: 'POST',
-      body: JSON.stringify({ overall_score: overallScore }),
+      body: JSON.stringify({ plddt, iptm }),
     })
   },
-  updateScore(id: number, overallScore: number) {
+  updateScore(id: number, plddt: number, iptm: number) {
     return request<AdminSubmission>(`/api/admin/submissions/${id}/score`, {
       method: 'PUT',
-      body: JSON.stringify({ overall_score: overallScore }),
+      body: JSON.stringify({ plddt, iptm }),
+    })
+  },
+  async uploadStructure(id: number, file: File) {
+    const token = getToken()
+    const body = new FormData()
+    body.append('file', file)
+    const response = await fetch(`/api/admin/submissions/${id}/structure`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      body,
+    })
+    const text = await response.text()
+    const payload = text ? JSON.parse(text) : null
+    if (!response.ok) {
+      throw new ApiError(response.status, detailMessage(payload))
+    }
+    return payload as AdminSubmission
+  },
+  deleteStructure(id: number) {
+    return request<AdminSubmission>(`/api/admin/submissions/${id}/structure`, {
+      method: 'DELETE',
     })
   },
   publish(id: number) {

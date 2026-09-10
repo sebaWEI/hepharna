@@ -32,6 +32,9 @@ export function LeaderboardPage() {
               <p className="text-sm text-mute">{places[index]}</p>
               <p className="mt-1 text-3xl">{entry.username}</p>
               <p className="mt-1 font-mono text-2xl text-accent">{entry.score.toFixed(2)}</p>
+              <p className="mt-1 font-mono text-sm text-mute">
+                pLDDT {entry.plddt?.toFixed(2) ?? '-'} · ipTM {entry.iptm?.toFixed(2) ?? '-'}
+              </p>
             </div>
           ))}
         </div>

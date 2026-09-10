@@ -41,8 +41,14 @@ export function LeaderboardList({
             <span>
               <span className="block text-lg">{entry.username}</span>
               <span className="font-mono text-xs text-mute">{entry.participant_id}</span>
+              <span className="mt-1 block font-mono text-xs text-mute">
+                pLDDT {formatScore(entry.plddt)} · ipTM {formatScore(entry.iptm)}
+              </span>
             </span>
-            <span className="font-mono text-2xl">{formatScore(entry.score)}</span>
+            <span className="text-right">
+              <span className="block font-mono text-2xl">{formatScore(entry.score)}</span>
+              <span className="text-[11px] tracking-wide text-mute">{t('admin.total')}</span>
+            </span>
           </motion.li>
         )
       })}

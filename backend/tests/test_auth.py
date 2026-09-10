@@ -4,6 +4,7 @@ from tests.conftest import auth_header, register_user
 def test_register_and_login(client):
     created = register_user(client, "Alice")
     assert created["user"]["username"] == "Alice"
+    assert created["user"]["email"] == "alice@example.com"
     assert created["user"]["participant_id"].startswith("HEPHA-")
     assert created["user"]["role"] == "user"
     assert created["access_token"]
@@ -11,6 +12,7 @@ def test_register_and_login(client):
     me = client.get("/api/auth/me", headers=auth_header(created["access_token"]))
     assert me.status_code == 200
     assert me.json()["username"] == "Alice"
+    assert me.json()["email"] == "alice@example.com"
 
     login = client.post("/api/auth/login", json={"username": "Alice", "password": "secret123"})
     assert login.status_code == 200
@@ -27,9 +29,37 @@ def test_duplicate_username(client):
     register_user(client, "Alice")
     response = client.post(
         "/api/auth/register",
-        json={"username": "Alice", "password": "secret123", "confirm_password": "secret123"},
+        json={
+            "username": "Alice",
+            "email": "other@example.com",
+            "password": "secret123",
+            "confirm_password": "secret123",
+        },
     )
     assert response.status_code == 400
+
+
+def test_duplicate_email(client):
+    register_user(client, "Alice")
+    response = client.post(
+        "/api/auth/register",
+        json={
+            "username": "Bob",
+            "email": "alice@example.com",
+            "password": "secret123",
+            "confirm_password": "secret123",
+        },
+    )
+    assert response.status_code == 400
+    assert "email" in response.json()["detail"].lower()
+
+
+def test_register_requires_email(client):
+    response = client.post(
+        "/api/auth/register",
+        json={"username": "Alice", "password": "secret123", "confirm_password": "secret123"},
+    )
+    assert response.status_code == 422
 
 
 def test_unauthenticated_challenge_routes(client):

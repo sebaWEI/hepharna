@@ -9,6 +9,11 @@ EDITABLE_STATUSES = {"draft"}
 SCOREABLE_STATUSES = {"submitted", "evaluating", "scored", "published"}
 
 
+def total_score(plddt: float, iptm: float) -> float:
+    """Overall score is the equal average of complex_plddt and iptm (Boltz 0-1 scale)."""
+    return round(0.5 * plddt + 0.5 * iptm, 6)
+
+
 class ScoringService(ABC):
     """Extension point for future automated Boltz scoring."""
 
@@ -17,12 +22,10 @@ class ScoringService(ABC):
         self,
         db: Session,
         design: Design,
-        overall_score: float,
         admin: User,
-        structure_score: float | None = None,
-        interface_score: float | None = None,
-        clash_score: float | None = None,
-        confidence_score: float | None = None,
+        *,
+        plddt: float,
+        iptm: float,
     ) -> Score:
         raise NotImplementedError
 
@@ -32,12 +35,10 @@ class ManualScoringService(ScoringService):
         self,
         db: Session,
         design: Design,
-        overall_score: float,
         admin: User,
-        structure_score: float | None = None,
-        interface_score: float | None = None,
-        clash_score: float | None = None,
-        confidence_score: float | None = None,
+        *,
+        plddt: float,
+        iptm: float,
     ) -> Score:
         score = design.score
         if score is None:
@@ -45,11 +46,11 @@ class ManualScoringService(ScoringService):
             db.add(score)
             design.score = score
 
-        score.overall_score = overall_score
-        score.structure_score = structure_score
-        score.interface_score = interface_score
-        score.clash_score = clash_score
-        score.confidence_score = confidence_score
+        score.structure_score = plddt
+        score.interface_score = iptm
+        score.overall_score = total_score(plddt, iptm)
+        score.clash_score = None
+        score.confidence_score = None
         score.updated_by = admin.id
         score.updated_at = utcnow()
 

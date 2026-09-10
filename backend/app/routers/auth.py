@@ -26,6 +26,7 @@ def _token_response(user: User) -> TokenResponse:
 @router.post("/register", response_model=TokenResponse)
 def register(payload: RegisterRequest, db: Annotated[Session, Depends(get_db)]) -> TokenResponse:
     username = payload.username.strip()
+    email = str(payload.email).strip().lower()
     if not username:
         raise HTTPException(status_code=400, detail="Nickname is required.")
     if payload.confirm_password is not None and payload.password != payload.confirm_password:
@@ -33,9 +34,13 @@ def register(payload: RegisterRequest, db: Annotated[Session, Depends(get_db)]) 
     existing = db.query(User).filter(User.username == username).first()
     if existing:
         raise HTTPException(status_code=400, detail="That nickname is already taken.")
+    email_taken = db.query(User).filter(User.email == email).first()
+    if email_taken:
+        raise HTTPException(status_code=400, detail="That email is already registered.")
 
     user = User(
         username=username,
+        email=email,
         password_hash=hash_password(payload.password),
         role="user",
         participant_id=next_participant_id(db),
@@ -75,6 +80,7 @@ def _me_payload(user: User, db: Session) -> MeResponse:
     return MeResponse(
         id=user.id,
         username=user.username,
+        email=user.email,
         participant_id=user.participant_id,
         role=user.role,
         rank=rank,

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { SequenceDisplay } from '../components/SequenceDisplay'
 import { StatusBadge } from '../components/StatusBadge'
+import { StructureViewer } from '../components/StructureViewer'
 import { useLocale } from '../context/LocaleContext'
 import { api } from '../services/api'
 import type { DesignPublic } from '../types'
@@ -49,13 +50,15 @@ export function DesignDetailPage() {
             <span className="mt-1 block font-mono text-2xl">{design.gc_content.toFixed(1)}%</span>
           </p>
           <p>
-            {t('designs.status')}
-            <span className="mt-2 block">
-              <StatusBadge status={design.status} />
-            </span>
+            {t('admin.plddt')}
+            <span className="mt-1 block font-mono text-2xl">{formatScore(design.scores?.plddt)}</span>
           </p>
           <p>
-            {t('designs.colScore')}
+            {t('admin.iptm')}
+            <span className="mt-1 block font-mono text-2xl">{formatScore(design.scores?.iptm)}</span>
+          </p>
+          <p>
+            {t('admin.total')}
             <span className="mt-1 block font-mono text-2xl">{formatScore(design.score)}</span>
           </p>
           <p>
@@ -63,11 +66,22 @@ export function DesignDetailPage() {
             <span className="mt-1 block font-mono text-2xl">{design.rank ? `#${design.rank}` : '-'}</span>
           </p>
           <p>
+            {t('designs.status')}
+            <span className="mt-2 block">
+              <StatusBadge status={design.status} />
+            </span>
+          </p>
+          <p>
             {t('designs.submitted')}
             <span className="mt-1 block text-mute">{formatDate(design.submitted_at, locale)}</span>
           </p>
         </div>
       </div>
+      {design.has_structure ? (
+        <div className="mt-6">
+          <StructureViewer designId={design.id} filename={design.structure_filename} />
+        </div>
+      ) : null}
       <Link to="/design" className="mt-6 inline-block text-accent">
         {t('designs.newDraft')}
       </Link>

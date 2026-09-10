@@ -1,10 +1,22 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class RegisterRequest(BaseModel):
     username: str = Field(min_length=2, max_length=32)
+    email: str = Field(min_length=5, max_length=255)
     password: str = Field(min_length=6, max_length=128)
     confirm_password: str | None = Field(default=None, max_length=128)
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, value: str) -> str:
+        email = value.strip().lower()
+        if "@" not in email or "." not in email.split("@")[-1]:
+            raise ValueError("Please enter a valid email address.")
+        local, _, domain = email.partition("@")
+        if not local or not domain or " " in email:
+            raise ValueError("Please enter a valid email address.")
+        return email
 
 
 class LoginRequest(BaseModel):
@@ -21,6 +33,7 @@ class TokenResponse(BaseModel):
 class UserPublic(BaseModel):
     id: int
     username: str
+    email: str | None = None
     participant_id: str
     role: str
 

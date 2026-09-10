@@ -91,7 +91,14 @@ export function AdminSubmissionsPage() {
                 <td className="py-4">
                   <StatusBadge status={row.status} />
                 </td>
-                <td className="py-4 font-mono">{formatScore(row.score)}</td>
+                <td className="py-4 font-mono">
+                  <span className="block">{formatScore(row.score)}</span>
+                  {row.scores?.plddt != null || row.scores?.iptm != null ? (
+                    <span className="text-xs text-mute">
+                      {formatScore(row.scores?.plddt)} / {formatScore(row.scores?.iptm)}
+                    </span>
+                  ) : null}
+                </td>
               </tr>
             ))}
           </tbody>

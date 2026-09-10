@@ -25,6 +25,7 @@ export function AdminUsersPage() {
           <thead className="text-xs tracking-[0.16em] text-mute">
             <tr>
               <th className="pb-3 font-normal">{t('admin.colNickname')}</th>
+              <th className="pb-3 font-normal">{t('admin.colEmail')}</th>
               <th className="pb-3 font-normal">{t('admin.colPid')}</th>
               <th className="pb-3 font-normal">{t('admin.colRole')}</th>
               <th className="pb-3 font-normal">{t('admin.colSubs')}</th>
@@ -36,6 +37,7 @@ export function AdminUsersPage() {
             {users.map((user) => (
               <tr key={user.id} className="border-t border-line">
                 <td className="py-4">{user.username}</td>
+                <td className="py-4 font-mono text-sm">{user.email || '-'}</td>
                 <td className="py-4 font-mono">{user.participant_id}</td>
                 <td className="py-4 text-mute">
                   {user.role === 'admin' ? t('admin.roleAdmin') : t('admin.roleUser')}

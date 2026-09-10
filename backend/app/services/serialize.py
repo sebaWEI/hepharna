@@ -17,10 +17,8 @@ def serialize_design(design: Design, rank: int | None = None) -> DesignPublic:
         scores=(
             ScorePublic(
                 overall_score=score_row.overall_score,
-                structure_score=score_row.structure_score,
-                interface_score=score_row.interface_score,
-                clash_score=score_row.clash_score,
-                confidence_score=score_row.confidence_score,
+                plddt=score_row.structure_score,
+                iptm=score_row.interface_score,
                 published_at=score_row.published_at,
                 updated_at=score_row.updated_at,
             )
@@ -28,6 +26,8 @@ def serialize_design(design: Design, rank: int | None = None) -> DesignPublic:
             else None
         ),
         rank=rank,
+        has_structure=bool(design.structure_path and design.structure_filename),
+        structure_filename=design.structure_filename,
         submitted_at=design.submitted_at,
         published_at=design.published_at,
         created_at=design.created_at,

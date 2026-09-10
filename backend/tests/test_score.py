@@ -25,12 +25,15 @@ def test_admin_score_publish_unpublish_edit(client, db_session):
 
     scored = client.post(
         f"/api/admin/submissions/{pk}/score",
-        json={"overall_score": 94.82},
+        json={"plddt": 0.546245, "iptm": 0.590283},
         headers=auth_header(admin),
     )
     assert scored.status_code == 200
-    assert scored.json()["status"] == "scored"
-    assert scored.json()["score"] == 94.82
+    body = scored.json()
+    assert body["status"] == "scored"
+    assert body["score"] == 0.568264
+    assert body["scores"]["plddt"] == 0.546245
+    assert body["scores"]["iptm"] == 0.590283
 
     board = client.get("/api/leaderboard").json()
     assert board["entries"] == []
@@ -44,19 +47,21 @@ def test_admin_score_publish_unpublish_edit(client, db_session):
 
     board = client.get("/api/leaderboard").json()
     assert len(board["entries"]) == 1
-    assert board["entries"][0]["score"] == 94.82
+    assert board["entries"][0]["score"] == 0.568264
+    assert board["entries"][0]["plddt"] == 0.546245
+    assert board["entries"][0]["iptm"] == 0.590283
 
     edited = client.put(
         f"/api/admin/submissions/{pk}/score",
-        json={"overall_score": 94.28},
+        json={"plddt": 0.94, "iptm": 0.9456},
         headers=auth_header(admin),
     )
     assert edited.status_code == 200
-    assert edited.json()["score"] == 94.28
+    assert edited.json()["score"] == 0.9428
     assert edited.json()["status"] == "published"
 
     board = client.get("/api/leaderboard").json()
-    assert board["entries"][0]["score"] == 94.28
+    assert board["entries"][0]["score"] == 0.9428
 
     unpublished = client.post(
         f"/api/admin/submissions/{pk}/unpublish",
@@ -70,12 +75,35 @@ def test_admin_score_publish_unpublish_edit(client, db_session):
     assert me["best_score"] is None
 
 
+def test_admin_can_upload_structure(client, db_session, tmp_path):
+    admin = _admin_token(client, db_session)
+    _user_token, design = _submit_as_user(client)
+    pk = design["id"]
+    content = b"data_test\n_entry.id test\n"
+    response = client.post(
+        f"/api/admin/submissions/{pk}/structure",
+        headers=auth_header(admin),
+        files={"file": ("model.cif", content, "chemical/x-cif")},
+    )
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["has_structure"] is True
+    assert body["structure_filename"] == "model.cif"
+
+    downloaded = client.get(
+        f"/api/designs/{pk}/structure",
+        headers=auth_header(_user_token),
+    )
+    assert downloaded.status_code == 200
+    assert downloaded.content == content
+
+
 def test_user_cannot_write_score_via_admin_api(client, db_session):
     _admin_token(client, db_session)
     user_token, design = _submit_as_user(client)
     response = client.post(
         f"/api/admin/submissions/{design['id']}/score",
-        json={"overall_score": 99.99},
+        json={"plddt": 0.99, "iptm": 0.99},
         headers=auth_header(user_token),
     )
     assert response.status_code == 403

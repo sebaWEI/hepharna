@@ -10,6 +10,8 @@ class LeaderboardEntry(BaseModel):
     username: str
     participant_id: str
     score: float
+    plddt: float | None = None
+    iptm: float | None = None
     design_id: str
     published_at: datetime | None = None
 
@@ -32,16 +34,15 @@ class AdminDashboard(BaseModel):
 
 
 class ScoreInput(BaseModel):
-    overall_score: float = Field(ge=0, le=100)
-    structure_score: float | None = Field(default=None, ge=0, le=100)
-    interface_score: float | None = Field(default=None, ge=0, le=100)
-    clash_score: float | None = Field(default=None, ge=0, le=100)
-    confidence_score: float | None = Field(default=None, ge=0, le=100)
+    # Boltz confidence JSON uses a 0-1 scale (e.g. complex_plddt, iptm).
+    plddt: float = Field(ge=0, le=1)
+    iptm: float = Field(ge=0, le=1)
 
 
 class AdminUser(BaseModel):
     id: int
     username: str
+    email: str | None = None
     participant_id: str
     role: str
     created_at: datetime

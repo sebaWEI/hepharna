@@ -11,6 +11,7 @@ export type DesignStatus =
 export type UserPublic = {
   id: number
   username: string
+  email?: string | null
   participant_id: string
   role: Role
   rank: number | null
@@ -21,10 +22,8 @@ export type UserPublic = {
 
 export type ScorePublic = {
   overall_score: number
-  structure_score: number | null
-  interface_score: number | null
-  clash_score: number | null
-  confidence_score: number | null
+  plddt: number | null
+  iptm: number | null
   published_at: string | null
   updated_at: string | null
 }
@@ -40,6 +39,8 @@ export type DesignPublic = {
   score: number | null
   scores: ScorePublic | null
   rank: number | null
+  has_structure: boolean
+  structure_filename: string | null
   submitted_at: string | null
   published_at: string | null
   created_at: string
@@ -56,6 +57,8 @@ export type LeaderboardEntry = {
   username: string
   participant_id: string
   score: number
+  plddt: number | null
+  iptm: number | null
   design_id: string
   published_at: string | null
 }
@@ -119,6 +122,7 @@ export type AdminSubmission = DesignPublic & {
 export type AdminUser = {
   id: number
   username: string
+  email: string | null
   participant_id: string
   role: Role
   created_at: string

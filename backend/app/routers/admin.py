@@ -2,7 +2,7 @@ import csv
 import io
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from fastapi.responses import StreamingResponse
 from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
@@ -20,6 +20,7 @@ from app.services.challenge import utcnow
 from app.services.leaderboard import rank_for_user
 from app.services.scoring import SCOREABLE_STATUSES, manual_scoring_service
 from app.services.serialize import serialize_design
+from app.services.structures import delete_structure_file, resolve_structure_path, save_structure_upload
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -80,6 +81,7 @@ def list_users(
             AdminUser(
                 id=user.id,
                 username=user.username,
+                email=user.email,
                 participant_id=user.participant_id,
                 role=user.role,
                 created_at=user.created_at,
@@ -143,12 +145,9 @@ def _apply_score(db: Session, design: Design, payload: ScoreInput, admin: User) 
     manual_scoring_service.save_score(
         db,
         design,
-        overall_score=payload.overall_score,
-        admin=admin,
-        structure_score=payload.structure_score,
-        interface_score=payload.interface_score,
-        clash_score=payload.clash_score,
-        confidence_score=payload.confidence_score,
+        admin,
+        plddt=payload.plddt,
+        iptm=payload.iptm,
     )
     db.commit()
     db.refresh(design)
@@ -213,6 +212,43 @@ def unpublish_score(
     return _submission_payload(design)
 
 
+@router.post("/submissions/{design_pk}/structure", response_model=AdminSubmission)
+async def upload_structure(
+    design_pk: int,
+    _admin: Annotated[User, Depends(get_current_admin)],
+    db: Annotated[Session, Depends(get_db)],
+    file: UploadFile = File(...),
+) -> AdminSubmission:
+    design = _load_submission(db, design_pk)
+    if design.status == "draft":
+        raise HTTPException(status_code=400, detail="Drafts cannot receive structure files.")
+    old_path = design.structure_path
+    filename, relative = await save_structure_upload(design.design_id, file)
+    design.structure_filename = filename
+    design.structure_path = relative
+    design.updated_at = utcnow()
+    db.commit()
+    delete_structure_file(old_path)
+    db.refresh(design)
+    return _submission_payload(design)
+
+
+@router.delete("/submissions/{design_pk}/structure", response_model=AdminSubmission)
+def delete_structure(
+    design_pk: int,
+    _admin: Annotated[User, Depends(get_current_admin)],
+    db: Annotated[Session, Depends(get_db)],
+) -> AdminSubmission:
+    design = _load_submission(db, design_pk)
+    delete_structure_file(design.structure_path)
+    design.structure_filename = None
+    design.structure_path = None
+    design.updated_at = utcnow()
+    db.commit()
+    db.refresh(design)
+    return _submission_payload(design)
+
+
 @router.get("/export")
 def export_csv(
     _admin: Annotated[User, Depends(get_current_admin)],
@@ -232,21 +268,30 @@ def export_csv(
             "design_id",
             "participant_id",
             "nickname",
+            "email",
             "sequence",
             "status",
+            "plddt",
+            "iptm",
             "score",
+            "structure_filename",
             "submitted_at",
         ]
     )
     for design in designs:
+        score = design.score
         writer.writerow(
             [
                 design.design_id,
                 design.user.participant_id,
                 design.user.username,
+                design.user.email or "",
                 design.sequence,
                 design.status,
-                "" if design.score is None else f"{design.score.overall_score:.2f}",
+                "" if score is None or score.structure_score is None else f"{score.structure_score:.6f}",
+                "" if score is None or score.interface_score is None else f"{score.interface_score:.6f}",
+                "" if score is None else f"{score.overall_score:.6f}",
+                design.structure_filename or "",
                 design.submitted_at.isoformat() if design.submitted_at else "",
             ]
         )

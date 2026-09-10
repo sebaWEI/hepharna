@@ -14,6 +14,8 @@ frontend/dist/
 
 data/*.sqlite
 data/*.sqlite-*
+backend/data/structures/*
+!backend/data/structures/.gitkeep
 *.sqlite
 *.db
 backups/

@@ -84,7 +84,12 @@ def auth_header(token: str) -> dict[str, str]:
 def register_user(client: TestClient, username: str, password: str = "secret123") -> dict:
     response = client.post(
         "/api/auth/register",
-        json={"username": username, "password": password, "confirm_password": password},
+        json={
+            "username": username,
+            "email": f"{username.lower()}@example.com",
+            "password": password,
+            "confirm_password": password,
+        },
     )
     assert response.status_code == 200, response.text
     return response.json()
