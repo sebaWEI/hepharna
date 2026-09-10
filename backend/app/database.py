@@ -71,6 +71,7 @@ def migrate_schema() -> None:
     if "users" in existing:
         _ensure_column("users", "email", "email VARCHAR(255)")
     if "designs" in existing:
+        _ensure_column("designs", "name", "name VARCHAR(80)")
         _ensure_column("designs", "structure_filename", "structure_filename VARCHAR(255)")
         _ensure_column("designs", "structure_path", "structure_path VARCHAR(512)")
 

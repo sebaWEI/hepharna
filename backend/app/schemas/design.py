@@ -1,14 +1,27 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
-class DesignCreate(BaseModel):
+class DesignInput(BaseModel):
     sequence: str = Field(min_length=1)
+    name: str | None = Field(default=None, max_length=80)
+
+    @field_validator("name", mode="before")
+    @classmethod
+    def normalize_name(cls, value):
+        if isinstance(value, str):
+            return value.strip() or None
+        return value
 
 
-class DesignUpdate(BaseModel):
-    sequence: str = Field(min_length=1)
+class DesignCreate(DesignInput):
+    # Explicit copies must not replace another unfinished draft.
+    new_draft: bool = False
+
+
+class DesignUpdate(DesignInput):
+    pass
 
 
 class ScorePublic(BaseModel):
@@ -22,6 +35,7 @@ class ScorePublic(BaseModel):
 class DesignPublic(BaseModel):
     id: int
     design_id: str
+    name: str | None = None
     version: int
     sequence: str
     status: str

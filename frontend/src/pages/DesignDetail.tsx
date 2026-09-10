@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { DesignFoldPreview } from '../components/DesignFoldPreview'
 import { SequenceDisplay } from '../components/SequenceDisplay'
 import { StatusBadge } from '../components/StatusBadge'
 import { StructureViewer } from '../components/StructureViewer'
@@ -10,16 +11,20 @@ import { formatDate, formatScore } from '../utils/rna'
 
 export function DesignDetailPage() {
   const { id } = useParams()
+  const [searchParams] = useSearchParams()
   const { locale, t, te } = useLocale()
   const [design, setDesign] = useState<DesignPublic | null>(null)
   const [error, setError] = useState('')
 
   useEffect(() => {
     if (!id) return
-    api
-      .getDesign(Number(id))
-      .then(setDesign)
-      .catch((err) => setError(te(err)))
+    let cancelled = false
+    setDesign(null)
+    setError('')
+    api.getDesign(Number(id))
+      .then((result) => { if (!cancelled) setDesign(result) })
+      .catch((err) => { if (!cancelled) setError(te(err)) })
+    return () => { cancelled = true }
   }, [id, te])
 
   if (error) {
@@ -37,7 +42,13 @@ export function DesignDetailPage() {
   return (
     <section className="mx-auto max-w-3xl px-4 py-10">
       <p className="font-mono text-sm text-accent">{design.design_id}</p>
-      <h1 className="mt-2 text-4xl">{t('designs.version', { n: String(design.version).padStart(2, '0') })}</h1>
+      <h1 className="mt-2 break-words text-4xl">{design.name || design.design_id}</h1>
+      <p className="mt-2 text-mute">{t('designs.version', { n: String(design.version).padStart(2, '0') })}</p>
+      <div className="mt-5 flex flex-wrap items-center gap-4">
+        <Link to={`/design?from=${design.id}`} className="rounded-full bg-accent px-5 py-2.5 text-bg">{t('designs.startHere')}</Link>
+        <Link to="/designs" className="text-accent">{t('designs.back')}</Link>
+      </div>
+      <DesignFoldPreview key={`${design.id}-${searchParams.get('preview')}`} designId={design.id} autoLoad={searchParams.get('preview') === '1'} />
       <div className="mt-8 rounded-[16px] border border-line bg-surface p-6">
         <SequenceDisplay sequence={design.sequence} />
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -82,9 +93,7 @@ export function DesignDetailPage() {
           <StructureViewer designId={design.id} filename={design.structure_filename} />
         </div>
       ) : null}
-      <Link to="/design" className="mt-6 inline-block text-accent">
-        {t('designs.newDraft')}
-      </Link>
+
     </section>
   )
 }

@@ -54,6 +54,7 @@ def leaderboard_entries(db: Session, limit: int | None = None) -> list[Leaderboa
                 plddt=score_row.structure_score if score_row else None,
                 iptm=score_row.interface_score if score_row else None,
                 design_id=design.design_id,
+                name=design.name,
                 published_at=design.published_at,
             )
         )

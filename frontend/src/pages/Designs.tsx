@@ -22,7 +22,7 @@ export function DesignsPage() {
 
   return (
     <section className="mx-auto max-w-5xl px-4 py-10">
-      <div className="flex items-end justify-between gap-4">
+      <div className="flex flex-wrap items-end justify-between gap-4">
         <h1 className="text-4xl">{t('designs.title')}</h1>
         <Link to="/design" className="text-accent">
           {t('designs.cta')}
@@ -41,21 +41,39 @@ export function DesignsPage() {
                 <th className="pb-3 font-normal">{t('designs.colScore')}</th>
                 <th className="pb-3 font-normal">{t('designs.colStatus')}</th>
                 <th className="pb-3 font-normal">{t('designs.colDate')}</th>
+                <th className="pb-3 font-normal">{t('designs.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {designs.map((design) => (
                 <tr key={design.id} className="border-t border-line">
-                  <td className="py-4">
-                    <Link to={`/designs/${design.id}`} className="font-mono text-accent">
-                      {design.design_id}
+                  <td className="max-w-64 py-4 pr-4">
+                    <Link to={`/designs/${design.id}`} className="block break-words text-accent">
+                      {design.name || design.design_id}
                     </Link>
+                    <p className="mt-1 font-mono text-xs text-mute">{design.design_id}</p>
+                    <p className="mt-1 text-xs text-mute">{t('designs.version', { n: design.version })}</p>
                   </td>
                   <td className="py-4 font-mono">{formatScore(design.score)}</td>
                   <td className="py-4">
                     <StatusBadge status={design.status} />
                   </td>
-                  <td className="py-4 text-mute">{formatDate(design.submitted_at ?? design.created_at, locale)}</td>
+                  <td className="py-4 pr-4 text-mute">{formatDate(design.submitted_at ?? design.created_at, locale)}</td>
+                  <td className="py-4">
+                    <div className="flex flex-wrap gap-2">
+                      <Link to={`/designs/${design.id}?preview=1`} className="rounded-full border border-line px-3 py-2 text-sm hover:border-accent">
+                        {t('designs.preview')}
+                      </Link>
+                      <Link to={`/design?from=${design.id}`} className="rounded-full bg-accent px-3 py-2 text-sm text-bg">
+                        {t('designs.startHere')}
+                      </Link>
+                      {design.status === 'draft' ? (
+                        <Link to={`/design?draft=${design.id}`} className="px-3 py-2 text-sm text-accent">
+                          {t('designs.editDraft')}
+                        </Link>
+                      ) : null}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>

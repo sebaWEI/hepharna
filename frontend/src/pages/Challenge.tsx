@@ -50,6 +50,7 @@ export function ChallengePage() {
           {error ? <p className="mt-4 text-danger">{error}</p> : null}
           {design ? (
             <div className="mt-5 grid gap-5">
+              <h3 className="break-words text-xl">{design.name || design.design_id}</h3>
               <SequenceDisplay sequence={design.sequence} />
               <StatusBadge status={design.status} />
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">

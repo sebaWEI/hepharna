@@ -8,6 +8,8 @@ from app.auth.deps import get_current_user
 from app.config import get_settings
 from app.database import get_db
 from app.models import Design, User
+from app.routers.fold import FoldPublic, _to_public
+from app.services.fold import fold_sequence
 from app.schemas.design import DesignCreate, DesignPublic, DesignUpdate, SubmitResponse
 from app.services.challenge import assert_challenge_open, utcnow
 from app.services.ids import make_design_id, next_design_version
@@ -53,8 +55,10 @@ def create_design(
         .order_by(Design.updated_at.desc())
         .first()
     )
-    if existing_draft:
+    if existing_draft and not payload.new_draft:
         existing_draft.sequence = stats.sequence
+        if "name" in payload.model_fields_set:
+            existing_draft.name = payload.name
         existing_draft.updated_at = utcnow()
         db.commit()
         db.refresh(existing_draft)
@@ -66,6 +70,7 @@ def create_design(
         user_id=user.id,
         version=version,
         sequence=stats.sequence,
+        name=payload.name,
         status="draft",
     )
     db.add(design)
@@ -83,6 +88,22 @@ def get_design(
     design = _owned_design(db, design_pk, user)
     rank, _ = rank_for_user(db, design.user_id)
     return serialize_design(design, rank if design.status == "published" else None)
+
+
+@router.get("/{design_pk}/fold", response_model=FoldPublic)
+def preview_design(
+    design_pk: int,
+    user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[Session, Depends(get_db)],
+) -> FoldPublic:
+    design = _owned_design(db, design_pk, user)
+    try:
+        # A historical design remains previewable if event length limits change.
+        return _to_public(fold_sequence(design.sequence, against_reference=False, enforce_length=False))
+    except SequenceValidationError as exc:
+        raise HTTPException(status_code=400, detail=exc.message) from exc
+    except Exception:
+        raise HTTPException(status_code=500, detail="Could not fold this sequence. Please try again.") from None
 
 
 @router.get("/{design_pk}/structure")
@@ -126,6 +147,8 @@ def update_design(
     except SequenceValidationError as exc:
         raise HTTPException(status_code=400, detail=exc.message) from exc
     design.sequence = stats.sequence
+    if "name" in payload.model_fields_set:
+        design.name = payload.name
     design.updated_at = utcnow()
     db.commit()
     db.refresh(design)

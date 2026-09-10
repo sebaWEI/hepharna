@@ -13,6 +13,7 @@ class LeaderboardEntry(BaseModel):
     plddt: float | None = None
     iptm: float | None = None
     design_id: str
+    name: str | None = None
     published_at: datetime | None = None
 
 

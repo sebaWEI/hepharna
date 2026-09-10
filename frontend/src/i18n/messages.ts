@@ -1,6 +1,26 @@
 export type Locale = 'en' | 'zh'
 
 export const en = {
+  'design.previous': 'Previous design',
+  'design.previousLabel': 'Previous design: {name}',
+  'design.originalReference': 'Initial HEPHA reference',
+  'design.referenceInfo': 'Reference structure and information',
+  'ref.sequence': 'Sequence',
+  'ref.dotBracket': 'Secondary structure (dot-bracket notation)',
+  'ref.viewStructureText': 'View structure text',
+
+  "design.name": "Design name",
+  "design.namePlaceholder": "For example: 地表最强RNA",
+  "design.nameHint": "Optional, up to 80 characters.",
+  "design.fromVersion": "Starting from {name} · Version {version}. Saving creates a separate draft and keeps the original version.",
+  "designs.actions": "Actions",
+  "designs.preview": "Preview",
+  "designs.startHere": "Start designing from here",
+  "designs.editDraft": "Continue draft",
+  "designs.secondary": "Secondary structure preview",
+  "designs.secondaryHint": "Calculated from this saved sequence using ViennaRNA. This preview is independent of the competition score.",
+  "designs.retry": "Try again",
+  "designs.energy": "Minimum free energy: {value} kcal/mol",
   'meta.title': 'HEPHA-RNA Design Challenge',
 
   'nav.home': 'Home',
@@ -266,6 +286,26 @@ export const en = {
 export type MessageKey = keyof typeof en
 
 export const zh: Record<MessageKey, string> = {
+  'design.previous': '上一版设计',
+  'design.previousLabel': '上一版设计：{name}',
+  'design.originalReference': '初始 HEPHA 参考',
+  'design.referenceInfo': '参考结构与信息',
+  'ref.sequence': '序列',
+  'ref.dotBracket': '二级结构（点括号表示）',
+  'ref.viewStructureText': '查看结构文本',
+
+  "design.name": "设计名称",
+  "design.namePlaceholder": "例如：地表最强RNA",
+  "design.nameHint": "选填，最多 80 个字符。",
+  "design.fromVersion": "基于“{name}”的第 {version} 版开始设计。保存时会新建草稿，并保留原版本。",
+  "designs.actions": "操作",
+  "designs.preview": "预览",
+  "designs.startHere": "从此处开始设计",
+  "designs.editDraft": "继续编辑草稿",
+  "designs.secondary": "二级结构预览",
+  "designs.secondaryHint": "使用 ViennaRNA 根据这条已保存的序列计算，预览结果独立于竞赛评分。",
+  "designs.retry": "重试",
+  "designs.energy": "最低自由能：{value} kcal/mol",
   'meta.title': 'HEPHA-RNA 设计挑战',
 
   'nav.home': '首页',
