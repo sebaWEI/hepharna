@@ -33,13 +33,13 @@ export function ChallengePage() {
   const rank = design?.status === 'published' ? user?.rank ?? null : null
 
   return (
-    <section className="mx-auto grid max-w-7xl gap-8 px-4 py-10 lg:grid-cols-[1.2fr_0.8fr]">
-      <div className="rounded-[16px] border border-line bg-surface p-6 md:p-8">
+    <section className="mx-auto grid max-w-7xl items-start gap-6 px-4 py-10 lg:grid-cols-[1.2fr_0.8fr]">
+      <div className="workspace-panel rounded-[16px] border border-line bg-surface p-6 md:p-8">
         <p className="font-mono text-xs tracking-[0.22em] text-accent">{t('challenge.kicker')}</p>
-        <h1 className="mt-4 text-4xl">{t('challenge.hello', { name: user?.username ?? '' })}</h1>
+        <h1 className="page-heading mt-4">{t('challenge.hello', { name: user?.username ?? '' })}</h1>
         <p className="mt-2 font-mono text-mute">{t('challenge.participant', { id: user?.participant_id ?? '' })}</p>
         <div className="mt-8 border-t border-line pt-8">
-          <h2 className="text-sm tracking-[0.16em] text-mute">{t('challenge.current')}</h2>
+          <h2 className="section-label text-sm text-mute">{t('challenge.current')}</h2>
           {submitted ? (
             <div className="mt-4 rounded-[16px] border border-accent/30 bg-accent/10 p-4">
               <p>{t('challenge.submitted')}</p>
@@ -79,17 +79,17 @@ export function ChallengePage() {
             <p className="mt-5 text-mute">{t('challenge.empty')}</p>
           )}
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/design" className="rounded-full bg-accent px-5 py-2.5 text-bg">
+            <Link to="/design" className="action-link rounded-full bg-accent px-5 py-2.5 text-bg">
               {current?.draft || design ? t('challenge.edit') : t('challenge.design')}
             </Link>
-            <Link to="/designs" className="rounded-full border border-line px-5 py-2.5">
+            <Link to="/designs" className="action-link rounded-full border border-line px-5 py-2.5">
               {t('challenge.mine')}
             </Link>
           </div>
         </div>
       </div>
-      <aside className="rounded-[16px] border border-line bg-surface p-6">
-        <h2 className="text-sm tracking-[0.16em] text-mute">{t('challenge.live')}</h2>
+      <aside className="workspace-panel rounded-[16px] border border-line bg-surface p-6">
+        <h2 className="section-label text-sm text-mute">{t('challenge.live')}</h2>
         <div className="mt-5">
           {data ? (
             <LeaderboardList

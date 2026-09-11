@@ -158,7 +158,7 @@ export function DesignPage() {
   return (
     <section className="mx-auto max-w-6xl px-4 py-10">
       <h1 className="text-4xl md:text-5xl">{t('design.title')}</h1>
-      <p className="mt-3 max-w-[56ch] text-mute">{t('design.intro')}</p>
+      <p className="design-intro mt-4 whitespace-pre-line text-mute">{t('design.intro')}</p>
       {source ? (
         <p className="mt-4 break-words border-l-2 border-accent pl-3 text-sm text-mute">
           {t('design.fromVersion', { name: source.name || source.design_id, version: source.version })}
@@ -172,7 +172,7 @@ export function DesignPage() {
         <p id="design-name-hint" className="mt-2 text-xs text-mute">{t('design.nameHint')}</p>
       </div>
       <fieldset disabled={saving || submitting} className="min-w-0 border-0 p-0">
-      <div className="mt-6 flex flex-wrap gap-3">
+      <div className="design-actions mt-6 flex flex-wrap gap-3">
         <Button variant={mode === 'scratch' ? 'primary' : 'ghost'} onClick={() => chooseMode('scratch')}>
           {t('design.scratch')}
         </Button>
@@ -211,7 +211,7 @@ export function DesignPage() {
       {!config.challenge_open ? (
         <p className="mt-4 text-warn">{t('design.closed')}</p>
       ) : null}
-      <div className="mt-6 flex flex-wrap gap-3">
+      <div className="design-actions mt-6 flex flex-wrap gap-3">
         <Button variant="quiet" onClick={previewStructure} disabled={folding || !parsed.valid}>
           {folding ? t('design.folding') : t('design.preview')}
         </Button>
@@ -222,7 +222,7 @@ export function DesignPage() {
           {submitting ? t('design.submitting') : t('design.submit')}
         </Button>
       </div>
-      <div className="mt-10 grid items-start gap-8 lg:grid-cols-2" aria-label={t('design.referenceInfo')}>
+      <div className="reference-grid mt-12 grid items-start gap-8 lg:grid-cols-2" aria-label={t('design.referenceInfo')}>
         <section className="min-w-0" aria-label={t('design.originalReference')}>
           <h2 className="text-xl">{source ? t('design.originalReference') : t('design.refTitle')}</h2>
           <p className="mt-1 text-sm text-mute">{t('design.refHint')}</p>

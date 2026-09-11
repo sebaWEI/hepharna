@@ -7,7 +7,7 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 export function Button({ variant = 'primary', className = '', disabled, children, ...props }: Props) {
   const base =
-    'inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50'
+    'inline-flex min-h-11 max-w-full items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium leading-relaxed text-center transition-colors active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50'
   const styles = {
     primary: 'bg-accent text-bg hover:bg-accent/90',
     ghost: 'border border-line text-ink hover:border-accent hover:text-accent',

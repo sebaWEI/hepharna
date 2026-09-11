@@ -74,7 +74,7 @@ export function SequenceEditor({ value, onChange, minLength, maxLength }: Props)
   return (
     <div className="grid gap-4">
       <div className="grid gap-2">
-        <div className="flex items-center justify-between text-sm text-mute">
+        <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-mute">
           <span>{t('seq.label')}</span>
           <span className="font-mono text-xs">{t('seq.group')}</span>
         </div>
@@ -83,7 +83,7 @@ export function SequenceEditor({ value, onChange, minLength, maxLength }: Props)
             <span>5'</span>
             <span>3'</span>
           </div>
-          <div className="grid grid-cols-3 gap-x-3 gap-y-4 sm:grid-cols-4 md:grid-cols-6">
+          <div className="grid grid-cols-2 gap-x-3 gap-y-4 min-[400px]:grid-cols-3 sm:grid-cols-4 md:grid-cols-6">
             {groups.map((group, groupIndex) => {
               const start = groupIndex * GROUP + 1
               return (
@@ -149,7 +149,7 @@ export function SequenceEditor({ value, onChange, minLength, maxLength }: Props)
           </div>
         </div>
       </div>
-      <div className="grid gap-3 rounded-[16px] border border-line bg-surface p-4 md:grid-cols-3">
+      <div className="editor-status grid gap-4 rounded-[16px] border border-line bg-surface p-5">
         <div>
           <p className="text-xs text-mute">{t('seq.length')}</p>
           <p className="font-mono text-2xl">{result.length} nt</p>

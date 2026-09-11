@@ -30,7 +30,8 @@ export function LeaderboardList({
             initial={animate && !reduce ? { opacity: 0.6, y: 6 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 160, damping: 22 }}
-            className={`grid grid-cols-[3rem_1fr_auto] items-center gap-4 rounded-[16px] px-4 py-3 ${
+            data-highlight={highlight === entry.participant_id}
+            className={`leaderboard-row grid items-center ${
               highlight === entry.participant_id ? 'bg-accent/10' : 'bg-raised/70'
             }`}
           >
@@ -39,15 +40,15 @@ export function LeaderboardList({
               {entry.rank}
             </span>
             <span className="min-w-0">
-              <span className="block break-words text-lg">{entry.name || entry.design_id}</span>
+              <span className="leaderboard-name block break-words">{entry.name || entry.design_id}</span>
               <span className="block break-words text-sm text-mute">{entry.username}</span>
               <span className="font-mono text-xs text-mute">{entry.participant_id}</span>
-              <span className="mt-1 block font-mono text-xs text-mute">
+              <span className="leaderboard-detail mt-1 block font-mono text-xs text-mute">
                 pLDDT {formatScore(entry.plddt)} · ipTM {formatScore(entry.iptm)}
               </span>
             </span>
             <span className="text-right">
-              <span className="block font-mono text-2xl">{formatScore(entry.score)}</span>
+              <span className="leaderboard-score block font-mono">{formatScore(entry.score)}</span>
               <span className="text-[11px] tracking-wide text-mute">{t('admin.total')}</span>
             </span>
           </motion.li>

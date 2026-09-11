@@ -20,58 +20,58 @@ export function AppShell() {
   ]
 
   return (
-    <div className="min-h-[100dvh] bg-bg text-ink">
+    <div className="app-frame min-h-[100dvh] bg-bg text-ink">
       <header className="sticky top-0 z-20 border-b border-line/80 bg-bg/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-          <NavLink to="/" className="font-medium tracking-[0.18em] text-accent">
+        <div className="site-header-inner mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-10">
+          <NavLink to="/" className="brand font-semibold text-accent">
             HEPHA-RNA
           </NavLink>
-          <nav className="hidden items-center gap-6 text-sm text-mute md:flex">
+          <nav className="hidden items-center gap-1 text-sm text-mute xl:flex">
             {links.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
-                className={({ isActive }) => (isActive ? 'text-ink' : 'hover:text-ink')}
+                className="nav-link"
               >
                 {link.label}
               </NavLink>
             ))}
             {user?.role === 'admin' ? (
-              <NavLink to="/admin" className="hover:text-ink">
+              <NavLink to="/admin" className="nav-link">
                 {t('nav.admin')}
               </NavLink>
             ) : null}
           </nav>
-          <div className="flex items-center gap-3 text-sm">
+          <div className="flex shrink-0 items-center gap-2 text-sm sm:gap-3">
             <LanguageToggle />
             {user ? (
               <>
-                <span className="hidden font-mono text-mute sm:inline">{user.participant_id}</span>
-                <button onClick={logout} className="inline-flex items-center gap-1 text-mute hover:text-ink">
+                <span className="hidden font-mono text-xs text-mute lg:inline">{user.participant_id}</span>
+                <button onClick={logout} className="inline-flex min-h-10 items-center gap-1 whitespace-nowrap text-mute hover:text-ink">
                   <SignOut size={16} />
                   {t('nav.logout')}
                 </button>
               </>
             ) : (
-              <NavLink to="/login" className="rounded-full bg-accent px-4 py-2 text-bg">
+              <NavLink to="/login" className="action-link rounded-full bg-accent px-4 py-2 text-bg">
                 {t('nav.login')}
               </NavLink>
             )}
           </div>
         </div>
-        <nav className="flex gap-4 overflow-x-auto px-4 pb-3 text-sm text-mute md:hidden">
+        <nav className="nav-scroll mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 pb-3 text-sm text-mute sm:px-6 xl:hidden">
           {links.map((link) => (
-            <NavLink key={link.to} to={link.to} className={({ isActive }) => (isActive ? 'text-ink' : '')}>
+            <NavLink key={link.to} to={link.to} className="nav-link">
               {link.label}
             </NavLink>
           ))}
         </nav>
       </header>
-      <main>
+      <main className="app-main">
         <Outlet />
       </main>
       <footer className="border-t border-line/80 px-4 py-8 text-center text-sm text-mute">
-        <p className="inline-flex items-center gap-2">
+        <p className="inline-flex max-w-xl items-center justify-center gap-2 leading-relaxed">
           <Cube size={16} />
           {t('nav.footer')}
         </p>
