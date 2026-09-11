@@ -8,6 +8,7 @@ def serialize_design(design: Design, rank: int | None = None) -> DesignPublic:
     return DesignPublic(
         id=design.id,
         design_id=design.design_id,
+        name=design.name,
         version=design.version,
         sequence=design.sequence,
         status=design.status,

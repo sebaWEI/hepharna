@@ -31,6 +31,7 @@ export type ScorePublic = {
 export type DesignPublic = {
   id: number
   design_id: string
+  name: string | null
   version: number
   sequence: string
   status: DesignStatus
@@ -60,6 +61,7 @@ export type LeaderboardEntry = {
   plddt: number | null
   iptm: number | null
   design_id: string
+  name: string | null
   published_at: string | null
 }
 

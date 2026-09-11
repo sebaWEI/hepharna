@@ -99,6 +99,9 @@ export const api = {
   getDesign(id: number) {
     return request<DesignPublic>(`/api/designs/${id}`)
   },
+  designFold(id: number) {
+    return request<FoldResult>(`/api/designs/${id}/fold`)
+  },
   structureUrl(id: number) {
     return `/api/designs/${id}/structure`
   },
@@ -130,16 +133,16 @@ export const api = {
     link.remove()
     URL.revokeObjectURL(url)
   },
-  saveDraft(sequence: string) {
+  saveDraft(sequence: string, name: string, newDraft = false) {
     return request<DesignPublic>('/api/designs', {
       method: 'POST',
-      body: JSON.stringify({ sequence }),
+      body: JSON.stringify({ sequence, name, new_draft: newDraft }),
     })
   },
-  updateDraft(id: number, sequence: string) {
+  updateDraft(id: number, sequence: string, name: string) {
     return request<DesignPublic>(`/api/designs/${id}`, {
       method: 'PUT',
-      body: JSON.stringify({ sequence }),
+      body: JSON.stringify({ sequence, name }),
     })
   },
   submit(id: number) {

@@ -38,8 +38,9 @@ export function LeaderboardList({
               {entry.rank <= 3 ? <Medal size={18} className={medal} weight="fill" /> : null}
               {entry.rank}
             </span>
-            <span>
-              <span className="block text-lg">{entry.username}</span>
+            <span className="min-w-0">
+              <span className="block break-words text-lg">{entry.name || entry.design_id}</span>
+              <span className="block break-words text-sm text-mute">{entry.username}</span>
               <span className="font-mono text-xs text-mute">{entry.participant_id}</span>
               <span className="mt-1 block font-mono text-xs text-mute">
                 pLDDT {formatScore(entry.plddt)} · ipTM {formatScore(entry.iptm)}

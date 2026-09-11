@@ -1,56 +1,63 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { RNAStructure } from '../components/RNAStructure'
-import { SequenceDisplay } from '../components/SequenceDisplay'
+import { Link, useSearchParams } from 'react-router-dom'
+import { FoldDetails } from '../components/FoldDetails'
+import { HistoricalDesignReference } from '../components/HistoricalDesignReference'
 import { useLocale } from '../context/LocaleContext'
 import { api } from '../services/api'
-import type { FoldResult } from '../types'
+import type { DesignPublic, FoldResult } from '../types'
 
 export function ReferencePage() {
   const { t, te } = useLocale()
+  const [searchParams] = useSearchParams()
+  const sourceId = searchParams.get('from')
   const [fold, setFold] = useState<FoldResult | null>(null)
-  const [error, setError] = useState('')
+  const [error, setError] = useState<unknown>(null)
+  const [sourceResult, setSourceResult] = useState<{ id: string; design?: DesignPublic; error?: unknown } | null>(null)
 
   useEffect(() => {
-    api
-      .referenceFold()
-      .then(setFold)
-      .catch((err) => setError(te(err)))
-  }, [te])
+    let cancelled = false
+    api.referenceFold()
+      .then((value) => { if (!cancelled) setFold(value) })
+      .catch((err: unknown) => { if (!cancelled) setError(err) })
+    return () => { cancelled = true }
+  }, [])
 
+  useEffect(() => {
+    if (sourceId === null) return
+    let cancelled = false
+    async function loadSource() {
+      const id = Number(sourceId)
+      if (!Number.isSafeInteger(id) || id <= 0) throw new Error('Design not found.')
+      return api.getDesign(id)
+    }
+    loadSource()
+      .then((design) => { if (!cancelled) setSourceResult({ id: sourceId, design }) })
+      .catch((err: unknown) => { if (!cancelled) setSourceResult({ id: sourceId, error: err }) })
+    return () => { cancelled = true }
+  }, [sourceId])
+
+  const source = sourceResult?.id === sourceId ? sourceResult : null
   return (
-    <section className="mx-auto max-w-5xl px-4 py-10">
+    <section className="mx-auto max-w-6xl px-4 py-10">
       <p className="font-mono text-sm tracking-[0.2em] text-accent">{t('ref.kicker')}</p>
       <h1 className="mt-3 text-4xl md:text-5xl">{t('ref.title')}</h1>
       <p className="mt-4 max-w-[56ch] text-mute">{t('ref.body')}</p>
-      {error ? <p className="mt-6 text-danger">{error}</p> : null}
-      {!fold && !error ? <p className="mt-6 text-mute">{t('ref.folding')}</p> : null}
-      {fold ? (
-        <div className="mt-8 grid gap-6">
-          <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-[16px] bg-surface p-4">
-              <p className="text-xs text-mute">{t('seq.length')}</p>
-              <p className="font-mono text-3xl">{fold.length} nt</p>
-            </div>
-            <div className="rounded-[16px] bg-surface p-4">
-              <p className="text-xs text-mute">{t('ref.mfe')}</p>
-              <p className="font-mono text-3xl">{fold.mfe.toFixed(2)} kcal/mol</p>
-            </div>
-            <div className="rounded-[16px] bg-surface p-4">
-              <p className="text-xs text-mute">{t('seq.gc')}</p>
-              <p className="font-mono text-3xl">{fold.gc_content.toFixed(1)}%</p>
-            </div>
-          </div>
-          <RNAStructure fold={fold} />
-          <div className="rounded-[16px] border border-line bg-surface p-5">
-            <SequenceDisplay sequence={fold.sequence} compact />
-            <p className="mt-4 break-all font-mono text-xs text-mute">{fold.structure}</p>
-          </div>
-          <Link to="/design" className="text-accent">
-            {t('ref.designFrom')}
-          </Link>
-        </div>
-      ) : null}
+      <div className={`mt-8 grid items-start gap-8 ${sourceId !== null ? 'lg:grid-cols-2' : ''}`}>
+        <section className="min-w-0" aria-label={t('design.originalReference')}>
+          {sourceId !== null ? <h2 className="mb-4 text-xl">{t('design.originalReference')}</h2> : null}
+          {error ? <p className="text-danger" role="alert">{te(error)}</p> : null}
+          {!fold && !error ? <p className="text-mute" role="status">{t('ref.folding')}</p> : null}
+          {fold ? <FoldDetails fold={fold} /> : null}
+        </section>
+        {sourceId !== null ? source?.design ? (
+          <HistoricalDesignReference key={source.design.id} design={source.design} />
+        ) : source?.error ? (
+          <p className="text-danger" role="alert">{te(source.error)}</p>
+        ) : <p className="text-mute" role="status">{t('designs.loading')}</p> : null}
+      </div>
+      <Link to={source?.design ? `/design?from=${source.design.id}` : '/design'} className="mt-6 inline-block text-accent">
+        {source?.design ? t('designs.startHere') : t('ref.designFrom')}
+      </Link>
     </section>
   )
 }
