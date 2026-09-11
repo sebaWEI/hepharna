@@ -8,7 +8,7 @@ export function FoldDetails({ fold, highlight = [] }: { fold: FoldResult; highli
   const { t } = useLocale()
   return (
     <div className="grid min-w-0 gap-4">
-      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <dl className="fold-metrics">
         <div>
           <dt className="text-xs text-mute">{t('seq.length')}</dt>
           <dd className="mt-1 font-mono text-xl">{fold.length} nt</dd>

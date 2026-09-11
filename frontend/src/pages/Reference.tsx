@@ -42,7 +42,7 @@ export function ReferencePage() {
       <p className="font-mono text-sm tracking-[0.2em] text-accent">{t('ref.kicker')}</p>
       <h1 className="mt-3 text-4xl md:text-5xl">{t('ref.title')}</h1>
       <p className="mt-4 max-w-[56ch] text-mute">{t('ref.body')}</p>
-      <div className={`mt-8 grid items-start gap-8 ${sourceId !== null ? 'lg:grid-cols-2' : ''}`}>
+      <div className={`reference-grid mt-8 grid items-start gap-8 ${sourceId !== null ? 'lg:grid-cols-2' : ''}`}>
         <section className="min-w-0" aria-label={t('design.originalReference')}>
           {sourceId !== null ? <h2 className="mb-4 text-xl">{t('design.originalReference')}</h2> : null}
           {error ? <p className="text-danger" role="alert">{te(error)}</p> : null}
